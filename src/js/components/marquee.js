@@ -84,9 +84,18 @@ export function initMarquees(root = document) {
           },
         }
       );
+
+      // Recriado depois dos pins da página (fonte carregada, resize),
+      // o gatilho volta para a ordem da página antes do próximo refresh.
+      motor.ScrollTrigger.sort();
+      motor.ScrollTrigger.refresh();
     };
 
     build();
+
+    // A largura do grupo depende da fonte: medida antes da P052 local
+    // chegar, a faixa ficaria curta e abriria um vão no fim.
+    if (document.fonts) document.fonts.ready.then(build);
 
     let resizeTimer;
     window.addEventListener('resize', () => {

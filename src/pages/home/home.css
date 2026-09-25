@@ -1,263 +1,315 @@
 /* =============================================================
-   HOME — Dr. Marcos Daniel Seabra
+   HOME — Dra. Isabela Barboza
    Ordem de leitura das seções neste arquivo = ordem no HTML.
    ============================================================= */
 
 /* =============================================================
    1. HERO
-   Bloco escuro de altura cheia. A tipografia domina; o retrato
-   entra recortado sobre uma mancha turquesa, e não dentro de um
-   quadro — o médico "ocupa" a página em vez de posar num card.
+   Implementação do design system (desginsystem/isabela-hero):
+   texto sobre marfim à esquerda; à direita um painel verde que
+   sangra até a borda da tela, com o vídeo da Dra. Isabela numa
+   moldura em arco de borda marfim. Um filete fecha a primeira
+   dobra. A barra de navegação é fixa, então o hero reserva a
+   altura dela no topo (7,6rem, a barra já compacta).
    ============================================================= */
 
 .hero {
   position: relative;
+  min-height: 100vh;
   min-height: 100svh;
   display: flex;
-  align-items: flex-end;
-  padding-top: 9rem;
-  padding-bottom: 3rem;
-  background: var(--c-ink);
-  color: var(--c-text-on-dark);
+  flex-direction: column;
+  padding-top: 7.6rem;
+  background: var(--c-paper);
+  color: var(--c-ink);
   overflow: hidden;
 }
 
-/* Mancha de cor: forma orgânica, borrada, animada muito devagar.
-   É o único elemento "decorativo" do hero e existe para separar
-   o retrato do fundo sem recorrer a uma caixa. */
-.hero__blob {
-  position: absolute;
-  right: -8vw;
-  bottom: -14vh;
-  width: min(78rem, 62vw);
-  aspect-ratio: 1 / 1.12;
-  background: radial-gradient(closest-side, rgba(53, 179, 193, .95), rgba(45, 129, 139, .55) 62%, transparent 72%);
-  filter: blur(1.5rem);
-  border-radius: 46% 54% 38% 62% / 55% 42% 58% 45%;
-  animation: blob-drift 22s ease-in-out infinite alternate;
-  pointer-events: none;
-}
-@keyframes blob-drift {
-  0%   { border-radius: 46% 54% 38% 62% / 55% 42% 58% 45%; transform: translate3d(0,0,0) rotate(0deg); }
-  100% { border-radius: 60% 40% 55% 45% / 40% 58% 42% 60%; transform: translate3d(-2vw, -2vh, 0) rotate(8deg); }
-}
-
-/* Malha fina sobre o fundo: dá textura de impressão ao escuro e
-   evita o "preto chapado" que denuncia template. */
-.hero::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background-image:
-    linear-gradient(rgba(255,255,255,.035) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,255,255,.035) 1px, transparent 1px);
-  background-size: 8rem 8rem;
-  -webkit-mask-image: radial-gradient(ellipse at 30% 40%, #000, transparent 78%);
-  mask-image: radial-gradient(ellipse at 30% 40%, #000, transparent 78%);
-  pointer-events: none;
-}
-
-.hero__shell { position: relative; z-index: 2; width: 100%; }
-
 .hero__grid {
+  flex: 1;
   display: grid;
-  grid-template-columns: repeat(12, 1fr);
-  gap: var(--gutter);
-  align-items: end;
+  grid-template-columns: minmax(0, 1.12fr) minmax(0, .88fr);
+  min-height: clamp(56rem, calc(100vh - 7.6rem), 85rem);
+  min-height: clamp(56rem, calc(100svh - 7.6rem), 85rem);
 }
 
-/* Ancora o selo, que é posicionado em relação a esta coluna. */
-.hero__copy { grid-column: 1 / 8; position: relative; }
+.hero__copy {
+  min-width: 0;
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: clamp(6.6rem, 8.5vh, 11.2rem) 5vw 8rem 0;
+}
 
 .hero__eyebrow {
-  display: inline-flex;
+  display: flex;
   align-items: center;
-  gap: 1.2rem;
-  margin-bottom: clamp(2rem, 3vw, 3.4rem);
-  padding: .9rem 1.8rem .9rem 1.2rem;
-  border-radius: 70rem;
-  background: rgba(255, 255, 255, .06);
-  box-shadow: inset 0 0 0 1px var(--c-ink-3);
-  color: var(--c-brand-soft);
+  gap: 1.5rem;
+  margin-bottom: clamp(4.8rem, 7vh, 7.6rem);
+  font-size: 1.1rem;
+  font-weight: 700;
+  letter-spacing: .22em;
 }
-.hero__eyebrow i {
-  width: .7rem; height: .7rem;
-  border-radius: 50%;
-  background: var(--c-accent);
-  box-shadow: 0 0 0 .5rem rgba(244, 147, 104, .18);
-  animation: pulse-dot 2.6s var(--ease) infinite;
-}
-@keyframes pulse-dot {
-  0%, 100% { box-shadow: 0 0 0 .35rem rgba(244, 147, 104, .16); }
-  50%      { box-shadow: 0 0 0 .9rem rgba(244, 147, 104, 0); }
-}
+.hero__eyebrow-line { width: 2.8rem; height: 1px; background: var(--c-accent); }
 
 .hero__title {
-  /* Dois degraus abaixo do --t-h1 global. A manchete tem sessenta
-     caracteres e quebra em quatro linhas; no tamanho cheio ela sozinha
-     comeria a primeira dobra e empurraria o botão de agendar para
-     fora dela, que é justamente onde ele precisa estar. */
-  font-size: clamp(2.6rem, 4.1vw, 5.8rem);
-  line-height: .98;
-  margin-bottom: clamp(1.8rem, 2.2vw, 2.8rem);
+  max-width: 80rem;
+  font-size: clamp(5.4rem, 5.6vw, 9.4rem);
+  line-height: 1.055;
+  letter-spacing: -0.055em;
 }
-/* A palavra que carrega a promessa recebe a cor de acento e a
-   itálica da Fraunces. É o único destaque de cor do título. */
-.hero__title .em { color: var(--c-accent); }
+/* A palavra de destaque ganha a itálica e o champanhe escuro — o
+   único momento de cor na manchete. */
+.hero__title .em { color: var(--c-accent-deep); }
 
 .hero__lead {
-  max-width: 52ch;
-  color: var(--c-muted-on-dark);
-  margin-bottom: clamp(2.2rem, 2.8vw, 3.4rem);
+  max-width: 51.5rem;
+  margin-top: 3rem;
+  font-size: clamp(1.6rem, 1.2vw, 1.9rem);
+  line-height: 1.65;
+  color: var(--c-muted-on-light);
 }
-.hero__lead strong { color: var(--c-text-on-dark); font-weight: 500; }
 
 .hero__actions {
-  position: relative;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 1.6rem;
+  gap: clamp(2rem, 3.2vw, 4.8rem);
+  margin-top: 4.2rem;
 }
 
-/* Fora da grade: presa ao canto inferior direito da seção, ela
-   encosta exatamente na faixa de credenciais que vem logo abaixo.
-   Dentro da grade, a altura dela mandava na altura da linha e
-   empurrava o texto. */
-/* Sem [data-reveal] aqui de propósito: aquele gesto entra com um
-   translateY de 3.2rem, e num elemento que precisa encostar na borda
-   de baixo o deslocamento vira uma folga de 32px que não fecha. */
-.hero__figure {
+/* Link secundário: texto com filete champanhe, sem caixa — o
+   botão cheio fica sozinho como a ação principal. */
+.hero__link {
+  display: inline-flex;
+  align-items: center;
+  gap: 1.2rem;
+  min-height: 4.4rem;
+  border-bottom: 1px solid var(--c-accent);
+  font-size: 1.3rem;
+  transition: color .2s var(--ease);
+}
+.hero__link span { font-size: 1.9rem; line-height: 0; }
+@media (hover: hover) and (pointer: fine) {
+  .hero__link:hover { color: var(--c-accent-deep); }
+}
+
+.hero__foot {
+  display: flex;
+  align-items: center;
+  gap: 2.5rem;
+  width: 100%;
+  margin-top: auto;
+  padding-top: 5.8rem;
+  font-size: 1.1rem;
+}
+.hero__foot-label {
+  letter-spacing: .15em;
+  text-transform: uppercase;
+  color: var(--c-accent-deep);
+  white-space: nowrap;
+}
+.hero__specialties { display: flex; flex-wrap: wrap; gap: 1.2rem 0; }
+.hero__specialties span + span::before { content: "·"; padding: 0 1rem; color: var(--c-accent); }
+
+/* ---- Coluna do vídeo ---- */
+.hero__visual {
+  position: relative;
+  min-width: 0;
+  display: flex;
+  /* Moldura presa ao topo, logo abaixo da barra: alinhada pela base,
+     a sobra de altura virava um vão vazio em cima do vídeo. */
+  align-items: flex-start;
+  justify-content: center;
+  padding: 2rem 3.4rem 4.2rem;
+}
+
+/* O painel sangra até a borda direita da tela: soma o respiro
+   lateral do .shell e, em telas mais largas que --maxw, a sobra
+   que centraliza o conteúdo. */
+.hero__backdrop {
   position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 12%;
+  right: calc(-1 * (var(--pad-x) + max(0px, (100vw - var(--maxw)) / 2)));
+  background: var(--c-ink);
+}
+.hero__backdrop::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 25% 20%, rgba(52, 100, 84, .67), transparent 53%);
+  opacity: .65;
+}
+
+/* A moldura tem a mesma proporção do vídeo (9:16): a altura manda e a
+   largura acompanha, então o vídeo aparece inteiro, sem corte na
+   cabeça nem nos pés. */
+.hero__frame {
+  position: relative;
+  z-index: 1;
+  /* Cabe inteiro na tela: desconta a barra (7,6rem) e o respiro de
+     cima e de baixo da coluna (2rem + 4,2rem). */
+  height: min(calc(100vh - 13.8rem), 71.5rem);
+  height: min(calc(100svh - 13.8rem), 71.5rem);
+  min-height: 36rem;
+  aspect-ratio: 9 / 16;
+  max-width: 100%;
+  margin: 0;
+  overflow: hidden;
+  border: .7rem solid var(--c-paper);
+  border-bottom: 0;
+  border-radius: 46% 46% 0 0 / 28% 28% 0 0;
+  background: #b9afa2;
+  box-shadow: 0 2.2rem 5.2rem rgba(0, 0, 0, .13);
+}
+.hero__video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 50%;
+}
+
+.hero__caption {
+  position: absolute;
+  right: 3rem;
+  bottom: 5rem;
+  z-index: 2;
+  display: flex;
+  align-items: flex-start;
+  gap: 1.8rem;
+  font-family: var(--f-display);
+  font-size: 1.6rem;
+  font-style: italic;
+  line-height: 1.3;
+  text-align: right;
+  color: var(--c-text-on-dark);
+}
+.hero__caption-index {
+  font-family: var(--f-sans);
+  font-size: 1.1rem;
+  font-style: normal;
+  line-height: 1.5;
+  letter-spacing: .14em;
+  color: #c8b898;
+}
+
+.hero__vertical {
+  position: absolute;
+  right: .5rem;
+  top: 50%;
+  z-index: 1;
+  transform: translateY(-50%);
+  writing-mode: vertical-rl;
+  font-size: 1rem;
+  letter-spacing: .22em;
+  text-transform: uppercase;
+  color: #e1e2d9;
+}
+
+.hero__rule {
+  position: absolute;
+  left: var(--pad-x);
   right: var(--pad-x);
   bottom: 0;
   z-index: 1;
-  margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 4.2rem;
+  border-top: 1px solid rgba(21, 58, 50, .18);
+  font-size: 1rem;
+  letter-spacing: .15em;
+  text-transform: uppercase;
+  color: var(--c-muted-on-light);
   pointer-events: none;
 }
-/* A foto de estudio vem sobre fundo branco. Em vez de servir um
-   PNG com alfa de 1,2 MB, servimos o JPG (102 KB) recortado por
-   uma mascara em tons de cinza de 16 KB: mesmo resultado, um
-   decimo do peso. */
-.hero__figure img {
-  height: min(88svh, 104rem);
-  width: auto;
-  display: block;
-  /* Relativo ao ARQUIVO CSS, não à página: este arquivo mora em
-     src/pages/home/, então sobe três níveis até a raiz do projeto. */
-  -webkit-mask-image: url('../../../assets/images/pages/home/dr-recorte-mask.png');
-  mask-image: url('../../../assets/images/pages/home/dr-recorte-mask.png');
-  -webkit-mask-size: 100% 100%;
-  mask-size: 100% 100%;
-  -webkit-mask-repeat: no-repeat;
-  mask-repeat: no-repeat;
-  filter: drop-shadow(0 4rem 8rem rgba(0, 0, 0, .5));
+.hero__rule span:last-child { font-size: 1.9rem; line-height: 1; }
+
+/* ---- Coreografia de entrada (home.js › initHero) ----
+   O vídeo tem 8 s. Enquanto ele roda, o texto sobe de baixo para cima
+   na ordem de leitura: linha de apoio, manchete letra por letra (os
+   atrasos de cada letra vêm do JS em --d), parágrafo, áreas, legenda
+   e filete. Botões e barra de navegação só entram no fim do vídeo
+   (.is-finished). Os atrasos existem apenas na ENTRADA: ao sair do
+   hero tudo volta rápido e sem espera, pronto para repetir.
+   .is-sequenced é posta pelo JS — sem ele, nada fica escondido. */
+.hero.is-sequenced [data-hero-step] {
+  opacity: 0;
+  transform: translateY(2.4rem);
+  transition: opacity .3s var(--ease), transform .3s var(--ease-out);
+}
+.hero.is-playing [data-hero-step]:not([data-hero-step="final"]),
+.hero.is-finished [data-hero-step="final"] {
+  opacity: 1;
+  transform: none;
+  /* Longhands de propósito: o atalho "transition" zeraria o atraso de
+     cada bloco, que vem das regras abaixo (menos específicas). */
+  transition-property: opacity, transform;
+  transition-duration: 1s, 1.2s;
+  transition-timing-function: var(--ease), var(--ease-out);
+}
+.hero.is-playing [data-hero-step="1"] { transition-delay: .3s; }
+.hero.is-playing [data-hero-step="3"] { transition-delay: 4.4s; }
+.hero.is-playing [data-hero-step="4"] { transition-delay: 5.2s; }
+.hero.is-playing [data-hero-step="5"] { transition-delay: 5.8s; }
+.hero.is-playing [data-hero-step="6"] { transition-delay: 6.3s; }
+.hero.is-finished [data-hero-step="final"] { transition-delay: .15s; }
+
+/* Manchete: a máscara continua sendo a palavra (.w), mas quem sobe
+   é cada letra. A palavra em si fica parada. */
+.hero__title .w__in { transform: none; transition: none; }
+.hero__title .ch {
+  display: inline-block;
+  transform: translateY(115%);
+  transition: transform .3s var(--ease-out);
+}
+.hero.is-playing .hero__title .ch {
+  transform: none;
+  transition: transform 1s var(--ease-out) var(--d, 0s);
 }
 
-/* Selo giratório com o registro profissional — o dado que o CFM
-   exige, tratado como elemento gráfico em vez de rodapé. */
-/* Encostado na borda direita da coluna de texto, na altura do
-   parágrafo de apresentação: fica longe da manchete, longe dos
-   botões, e cai sobre a margem transparente da foto — não sobre o
-   Dr. Marcos. */
-/* Ancorado na linha dos botões e encostado na borda direita da
-   coluna de texto. Ali é o único vão que fica livre em todas as
-   larguras: abaixo do parágrafo, ao lado dos botões e antes de onde
-   o retrato começa. */
-.hero__seal {
-  position: absolute;
-  right: 0;
-  top: 50%;
-  translate: 0 -50%;
-  width: 11rem; height: 11rem;
-  display: grid;
-  place-items: center;
-  pointer-events: none;
-}
-.hero__seal svg { width: 100%; height: 100%; animation: spin-slow 26s linear infinite; }
-.hero__seal text { font-size: 8.4px; letter-spacing: .28em; fill: var(--c-brand-soft); text-transform: uppercase; font-weight: 500; }
-.hero__seal-core {
-  position: absolute;
-  display: grid;
-  place-items: center;
-  width: 6.4rem; height: 6.4rem;
-  border-radius: 50%;
-  background: var(--c-accent);
-  color: var(--c-ink);
-  font-family: var(--f-display);
-  font-size: 1.15rem;
-  font-weight: 600;
-  line-height: 1.15;
-  text-align: center;
-}
+/* Usada pelo selo giratório do "Sobre mim". */
 @keyframes spin-slow { to { transform: rotate(360deg); } }
 
-/* Rodapé do hero: só a dica de rolagem. A prova social saiu daqui —
-   a primeira dobra já carrega manchete, subtítulo, dois botões e o
-   retrato; um quarto bloco competia por atenção com o CTA. */
-.hero__foot {
-  display: flex;
-  justify-content: flex-end;
-  margin-top: clamp(1rem, 1.2vw, 1.6rem);
-}
-.hero__scroll {
-  display: inline-flex;
-  align-items: center;
-  gap: 1rem;
-  font-size: var(--t-label);
-  letter-spacing: .14em;
-  text-transform: uppercase;
-  color: var(--c-muted-on-dark);
-}
-.hero__scroll i {
-  display: block;
-  width: 1px; height: 2.8rem;
-  background: linear-gradient(var(--c-accent), transparent);
-  animation: scroll-hint 2.2s var(--ease) infinite;
-  transform-origin: 50% 0;
-}
-@keyframes scroll-hint {
-  0%   { transform: scaleY(0); opacity: 0; }
-  35%  { transform: scaleY(1); opacity: 1; }
-  100% { transform: scaleY(1) translateY(3.6rem); opacity: 0; }
+@media (max-width: 1120px) {
+  .hero__copy { padding-right: 2.5rem; }
+  .hero__title { font-size: clamp(5.2rem, 6vw, 7.2rem); }
+  .hero__foot { display: block; }
+  .hero__specialties { margin-top: 1rem; }
 }
 
-@media (max-width: 1100px) {
-  .hero { align-items: flex-start; padding-top: 13rem; padding-bottom: 0; }
-  /* A .hero deixa de ser flex aqui. Com a foto virando filha direta
-     dela, em flex ela passava a ser um ITEM e roubava largura do
-     texto — foi o que jogou a coluna inteira para o lado no tablet.
-     Em bloco, a foto simplesmente vem depois do texto, e como a soma
-     dos dois passa da altura da tela, ela encosta na faixa de
-     credenciais aqui também. */
-  .hero { display: block; }
-  .hero__figure {
-    position: relative;
-    right: auto;
-    bottom: auto;
-    display: flex;
-    justify-content: center;
-    margin-top: clamp(2.4rem, 5vw, 4rem);
-  }
-  .hero__grid { grid-template-columns: repeat(6, 1fr); }
-  .hero__copy { grid-column: 1 / 7; }
-
-  /* O retrato passa a ser uma faixa depois do texto: o rosto é
-     prova social num site de médico, e o celular é onde a maioria
-     entra. Escondê-lo ali seria jogar fora o melhor ativo. */
-  .hero__figure {
-    grid-column: 1 / 7;
-    margin: clamp(2.4rem, 5vw, 4rem) 0 -3rem;
-    display: flex;
-    justify-content: center;
-  }
-  .hero__figure img { height: min(52svh, 62rem); margin: 0; }
-  .hero__seal { display: none; }
-  .hero__blob { right: -34vw; bottom: 8vh; width: 96vw; }
+@media (max-width: 820px) {
+  .hero__grid { grid-template-columns: 1fr; min-height: 0; }
+  .hero__copy { padding: 4rem 0 5.6rem; }
+  .hero__eyebrow { margin-bottom: 3.5rem; }
+  .hero__foot { margin-top: 4.8rem; padding-top: 2.2rem; border-top: 1px solid var(--c-line); }
+  .hero__visual { height: 65rem; padding: 3rem 6rem 0; }
+  .hero__backdrop { left: 7%; right: calc(-1 * var(--pad-x)); }
+  .hero__frame { height: 62rem; min-height: 0; }
+  .hero__caption { right: 1.8rem; bottom: 2rem; }
+  .hero__rule { display: none; }
 }
-@media (max-width: 640px) {
-  .hero__actions .btn { width: 100%; }
-  .hero__actions .btn__inner { justify-items: center; }
+
+@media (max-width: 480px) {
+  .hero__eyebrow { gap: .9rem; margin-bottom: 3rem; font-size: .9rem; letter-spacing: .15em; }
+  .hero__eyebrow-line { width: 1.8rem; }
+  .hero__title { font-size: clamp(4rem, 10.2vw, 4.9rem); line-height: 1.07; }
+  .hero__title br { display: none; }
+  .hero__lead { margin-top: 2.2rem; font-size: 1.6rem; line-height: 1.58; }
+  .hero__actions { flex-direction: column; align-items: flex-start; gap: 1.5rem; margin-top: 2.8rem; }
+  .hero__foot { margin-top: 3.6rem; }
+  .hero__foot-label { font-size: 1rem; }
+  .hero__specialties { font-size: 1.1rem; line-height: 1.5; }
+  .hero__visual { height: 49rem; padding: 2.2rem 3.8rem 0; }
+  .hero__frame { height: 46.8rem; border-width: .5rem; }
+  .hero__caption { right: .7rem; bottom: 1.4rem; gap: .7rem; font-size: 1.2rem; }
+  .hero__caption-index { font-size: .9rem; }
+  .hero__vertical { right: -.9rem; font-size: .8rem; }
 }
 
 /* =============================================================
@@ -279,10 +331,12 @@
    O argumento central do consultório, em tipografia grande.
    Sem cards: um parágrafo editorial cujas palavras-chave mudam
    de cor conforme entram na tela, e um bloco lateral com o
-   diferencial real (farmacêutico + dermatologista).
+   diferencial real (formação em cirurgia robótica).
    ============================================================= */
 
-.manifesto { background: var(--c-paper); }
+/* Fim da seção curto: o card horizontal fecha a abertura e os sintomas
+   começam logo em seguida, sem um vão de seção inteira no meio. */
+.manifesto { background: var(--c-paper); padding-bottom: clamp(3rem, 4vw, 5rem); }
 
 .manifesto__head {
   display: flex;
@@ -291,7 +345,7 @@
   gap: 2.4rem;
   margin-bottom: clamp(4rem, 6vw, 8rem);
   padding-bottom: 2rem;
-  border-bottom: 1px solid rgba(6, 35, 42, .14);
+  border-bottom: 1px solid rgba(21, 58, 50, .14);
 }
 .manifesto__head .label { color: var(--c-brand-deep); }
 .manifesto__head span { font-size: var(--t-sm); color: var(--c-muted-on-light); }
@@ -301,7 +355,7 @@
   font-size: clamp(2.8rem, 4.4vw, 6.4rem);
   font-weight: 400;
   line-height: 1.06;
-  letter-spacing: -0.035em;
+  letter-spacing: -0.016em;
   max-width: 22ch;
 }
 /* Cada palavra marcada acende quando a linha entra em cena.
@@ -310,22 +364,65 @@
   background: none;
   color: var(--c-brand-deep);
   font-style: italic;
-  font-variation-settings: 'SOFT' 40, 'WONK' 1, 'opsz' 120;
 }
 
 .manifesto__grid {
   display: grid;
   grid-template-columns: 1.25fr .75fr;
   gap: clamp(3rem, 6vw, 9rem);
-  align-items: start;
+  /* stretch: as duas colunas têm a mesma altura, e a foto preenche o
+     que sobra na da esquerda — nenhum lado termina com vão em branco. */
+  align-items: stretch;
 }
 @media (max-width: 1000px) { .manifesto__grid { grid-template-columns: 1fr; } }
 
-.manifesto__aside { display: grid; gap: 2.4rem; }
+/* Coluna em flex: o último card estica até a base da foto ao lado,
+   então a coluna nunca termina antes dela deixando vão. */
+.manifesto__aside { display: flex; flex-direction: column; gap: 2.4rem; }
+.manifesto__aside > :last-child { flex-grow: 1; }
 
-/* Bloco do diferencial: única superfície coral do site claro.
+/* Coluna da frase: a foto vem logo abaixo e, se a coluna dos cards for
+   mais alta, cresce para acompanhar. */
+.manifesto__main {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(4rem, 5vw, 7rem);
+}
+
+/* A foto nasce deitada — tombada para trás, dobrada na base como uma
+   página — e se levanta conforme a seção entra (home.js ›
+   initStandUp). A perspectiva mora no pai para o giro ter
+   profundidade real; o estado de pé é o padrão do CSS, então sem JS
+   ela já aparece em pé. */
+/* A proporção é a da própria foto (vertical): ela aparece inteira. Se
+   precisar crescer além disso para acompanhar a coluna, o corte do
+   cover tira só as laterais — o topo fica preso em object-position 0. */
+.manifesto__photo {
+  position: relative;
+  flex: 1 0 auto;
+  aspect-ratio: 1189 / 1323;
+  margin: 0;
+  perspective: 140rem;
+  perspective-origin: 50% 100%;
+}
+.manifesto__photo img {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 0%;
+  border-radius: var(--radius-xl);
+  box-shadow: 0 3rem 7rem -3.6rem rgba(21, 58, 50, .45);
+  transform-origin: 50% 100%;
+  backface-visibility: hidden;
+  will-change: transform;
+}
+
+/* Bloco do diferencial: única superfície cobre do site claro.
    Reservar a cor quente para UM argumento faz esse argumento
-   ser lido — se tudo fosse coral, nada seria. */
+   ser lido — se tudo fosse cobre, nada seria. */
 .diferencial {
   position: relative;
   padding: clamp(3rem, 4vw, 4.4rem);
@@ -339,7 +436,7 @@
   font-size: clamp(6rem, 9vw, 11rem);
   font-weight: 600;
   line-height: .8;
-  letter-spacing: -0.05em;
+  letter-spacing: -0.023em;
   opacity: .22;
   position: absolute;
   right: 2rem; bottom: -1rem;
@@ -353,10 +450,329 @@
   padding: clamp(2.4rem, 3vw, 3.2rem);
   border-radius: var(--radius-lg);
   background: var(--c-paper-2);
-  box-shadow: inset 0 0 0 1px rgba(6, 35, 42, .08);
+  box-shadow: inset 0 0 0 1px rgba(21, 58, 50, .08);
 }
 .manifesto__note .label { color: var(--c-brand-deep); }
 .manifesto__note p { color: var(--c-muted-on-light); }
+
+/* Card deitado na largura toda, fechando a seção: título à esquerda,
+   os três parágrafos lado a lado à direita. Verde profundo para
+   pesar como fecho depois dos cards claros. */
+.manifesto__energy {
+  display: grid;
+  grid-template-columns: minmax(0, .7fr) minmax(0, 1.3fr);
+  gap: clamp(2.4rem, 5vw, 7rem);
+  align-items: start;
+  margin-top: clamp(3rem, 4vw, 5rem);
+  padding: clamp(3rem, 4vw, 5.2rem);
+  border-radius: var(--radius-lg);
+  background: var(--c-ink);
+  color: var(--c-text-on-dark);
+}
+.manifesto__energy-head { display: grid; gap: 1.6rem; }
+/* Champanhe claro, o mesmo da legenda do hero: o champanhe padrão
+   fica abaixo do contraste mínimo sobre o verde profundo. */
+.manifesto__energy .label { color: #c8b898; }
+.manifesto__energy h3 { max-width: 14ch; }
+.manifesto__energy-body {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(2rem, 2.6vw, 3.6rem);
+}
+.manifesto__energy p { font-size: var(--t-sm); line-height: 1.65; color: var(--c-muted-on-dark); }
+.manifesto__energy strong { color: var(--c-text-on-dark); font-weight: 700; }
+
+@media (max-width: 1200px) {
+  .manifesto__energy { grid-template-columns: 1fr; }
+  .manifesto__energy h3 { max-width: 22ch; }
+}
+@media (max-width: 760px) {
+  .manifesto__energy-body { grid-template-columns: 1fr; gap: 1.4rem; }
+}
+/* Em coluna única não há coluna ao lado para acompanhar: a foto fica
+   na proporção dela e o último card não precisa esticar. */
+@media (max-width: 1000px) {
+  .manifesto__photo { flex: none; }
+  .manifesto__aside > :last-child { flex-grow: 0; }
+}
+
+/* Card da vitamina B12: verde lavado, a lista marcada com traço de
+   checagem em champanhe escuro. */
+.manifesto__b12 {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+  padding: clamp(2.4rem, 3vw, 3.2rem);
+  border-radius: var(--radius-lg);
+  background: var(--c-brand-soft);
+}
+.manifesto__b12 .label { color: var(--c-brand-deep); }
+.manifesto__b12 h3 { font-size: clamp(2.2rem, 2.2vw, 3rem); line-height: 1.1; }
+.manifesto__b12 p { color: var(--c-muted-on-light); }
+.manifesto__b12 .manifesto__b12-intro { margin-top: .6rem; font-weight: 700; color: var(--c-text-on-light); }
+.manifesto__b12-list { display: grid; gap: .6rem; list-style: none; }
+.manifesto__b12-list li {
+  display: grid;
+  grid-template-columns: 1.8rem 1fr;
+  gap: .8rem;
+  color: var(--c-muted-on-light);
+}
+.manifesto__b12-list li::before { content: "✓"; color: var(--c-accent-deep); font-weight: 700; }
+.manifesto__b12 .manifesto__b12-foot { margin-top: .6rem; font-family: var(--f-display); font-style: italic; font-size: var(--t-lead); color: var(--c-text-on-light); }
+
+/* =============================================================
+   3b. SINTOMAS — seção que prende e passa os cards na horizontal
+   Os cinco cards do carrossel do Instagram, na mesma ordem. A
+   seção fica presa enquanto a rolagem vertical empurra a fila de
+   cards para a esquerda: o gesto do carrossel, sem setas e sem
+   arrastar. Sem JS (ou com movimento reduzido) a fila vira uma
+   faixa com rolagem horizontal nativa e encaixe por card.
+   ============================================================= */
+
+/* clip, e não hidden: recorta a fila que sai pela lateral sem virar
+   contêiner de rolagem. */
+.symptoms { background: var(--c-paper); overflow: hidden; overflow: clip; }
+
+.symptoms__pin {
+  min-height: 100vh;
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: clamp(2.4rem, 4vh, 4.8rem);
+  padding-block: clamp(7rem, 11vh, 11rem) clamp(3rem, 5vh, 5rem);
+}
+
+.symptoms__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 2.4rem 4rem;
+}
+.symptoms__head .label { color: var(--c-brand-deep); display: block; margin-bottom: 1.6rem; }
+.symptoms__head h2 { max-width: 20ch; font-size: clamp(3rem, 4.2vw, 6rem); }
+
+.symptoms__meter {
+  display: flex;
+  align-items: center;
+  gap: 1.8rem;
+  flex: 1;
+  min-width: 22rem;
+  max-width: 44rem;
+  padding-bottom: .8rem;
+}
+.symptoms__count {
+  font-family: var(--f-display);
+  font-size: var(--t-sm);
+  font-weight: 600;
+  letter-spacing: .1em;
+  font-variant-numeric: lining-nums tabular-nums;
+  color: var(--c-brand-deep);
+}
+.symptoms__bar {
+  flex: 1;
+  height: 1px;
+  background: rgba(21, 58, 50, .16);
+  overflow: hidden;
+}
+.symptoms__bar i {
+  display: block;
+  height: 100%;
+  background: var(--c-accent);
+  transform-origin: 0 50%;
+  transform: scaleX(var(--p, 0));
+}
+
+/* Fallback: rolagem horizontal nativa com encaixe. Quando a seção é
+   presa pelo JS, a classe .is-pinned tira a rolagem e quem move a
+   fila é o transform. */
+.symptoms__viewport {
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scroll-padding-inline: var(--pad-x);
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Dica de gesto: só aparece quando a fila é deslizada com o dedo. */
+.symptoms__hint { display: none; font-size: var(--t-label); letter-spacing: .14em; text-transform: uppercase; color: var(--c-muted-on-light); }
+.symptoms__viewport::-webkit-scrollbar { display: none; }
+.symptoms.is-pinned .symptoms__viewport { overflow: visible; scroll-snap-type: none; }
+
+.symptoms__track {
+  display: flex;
+  align-items: stretch;
+  gap: clamp(1.6rem, 2vw, 2.8rem);
+  width: max-content;
+  padding-inline: var(--pad-x);
+  list-style: none;
+  will-change: transform;
+}
+
+/* ---- Card ---- */
+.scard {
+  --scard-bg: var(--c-white);
+  --scard-fg: var(--c-text-on-light);
+  --scard-idx: var(--c-accent);
+
+  position: relative;
+  flex: 0 0 auto;
+  width: clamp(32rem, 34vw, 52rem);
+  min-height: clamp(46rem, 62vh, 64rem);
+  min-height: clamp(46rem, 62svh, 64rem);
+  display: flex;
+  flex-direction: column;
+  gap: clamp(2rem, 2.4vw, 3.2rem);
+  padding: clamp(2.8rem, 3vw, 4.4rem);
+  border-radius: var(--radius-xl);
+  background: var(--scard-bg);
+  color: var(--scard-fg);
+  box-shadow: inset 0 0 0 1px rgba(21, 58, 50, .08), 0 3rem 6rem -3.6rem rgba(21, 58, 50, .35);
+  overflow: hidden;
+  scroll-snap-align: start;
+}
+
+/* Rodízio de cor: esmeralda, marfim, esmeralda lavado, profundo,
+   foto — a mesma sequência de temperaturas da jornada. */
+.scard--hero  { --scard-bg: var(--c-hero);       --scard-fg: var(--c-hero-ink);    --scard-idx: var(--c-hero-ink); }
+.scard--soft  { --scard-bg: var(--c-brand-soft); --scard-idx: var(--c-brand-deep); }
+.scard--ink   { --scard-bg: var(--c-ink);        --scard-fg: var(--c-text-on-dark); }
+.scard--photo { --scard-bg: var(--c-ink);        --scard-fg: var(--c-text-on-dark); width: clamp(34rem, 46vw, 72rem); }
+
+/* Anel sangrando pelo canto: a mesma geometria circular dos selos e
+   dos cards da jornada, ocupando o vazio sem ornamento novo. */
+.scard--hero::before {
+  content: "";
+  position: absolute;
+  right: -18%;
+  top: -22%;
+  width: 62%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  border: clamp(1.6rem, 2vw, 2.8rem) solid var(--c-white);
+  opacity: .22;
+  pointer-events: none;
+}
+
+.scard > *:not(.scard__img) { position: relative; z-index: 1; }
+
+.scard__top {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1.6rem;
+}
+/* Algarismo em itálica leve: o número marca a ordem do carrossel,
+   com a delicadeza da manchete e não o peso de um placar. */
+.scard__idx {
+  font-family: var(--f-display);
+  font-size: clamp(4.8rem, 5.4vw, 8rem);
+  font-style: italic;
+  font-weight: 300;
+  line-height: .8;
+  letter-spacing: -0.02em;
+  color: var(--scard-idx);
+}
+.scard__term {
+  font-size: 1.1rem;
+  font-weight: 500;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  padding: .6rem 1.2rem;
+  border-radius: 70rem;
+  box-shadow: inset 0 0 0 1px currentColor;
+  opacity: .75;
+  white-space: nowrap;
+}
+
+.scard__q {
+  font-size: clamp(2.4rem, 2.3vw, 3.4rem);
+  font-weight: 400;
+  line-height: 1.08;
+  letter-spacing: -0.012em;
+  text-wrap: balance;
+}
+.scard__q--lg { font-size: clamp(3.4rem, 3.6vw, 5.6rem); line-height: 1; margin-top: auto; }
+.scard__q--sm { font-size: clamp(2.1rem, 1.9vw, 2.8rem); }
+
+/* Corpo empurrado para o pé do card: a pergunta abre, a resposta
+   assenta embaixo, separada por um filete. */
+.scard__body {
+  display: grid;
+  gap: 1.6rem;
+  margin-top: auto;
+  padding-top: clamp(1.6rem, 2vw, 2.4rem);
+  border-top: 1px solid rgba(128, 128, 128, .22);
+  border-top: 1px solid color-mix(in srgb, currentColor 18%, transparent);
+}
+.scard__item { display: grid; gap: .8rem; }
+.scard__item + .scard__item {
+  padding-top: 1.6rem;
+  border-top: 1px solid rgba(128, 128, 128, .22);
+  border-top: 1px solid color-mix(in srgb, currentColor 12%, transparent);
+}
+.scard__sub {
+  font-family: var(--f-sans);
+  font-size: 1.15rem;
+  font-weight: 600;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: var(--c-accent);
+}
+.scard__text { font-size: var(--t-sm); line-height: 1.6; opacity: .86; max-width: 46ch; }
+.scard__text strong { font-weight: 600; opacity: 1; }
+.scard__text--strong { font-family: var(--f-display); font-size: clamp(2rem, 1.8vw, 2.6rem); line-height: 1.2; font-style: italic; opacity: 1; }
+.scard__meta { font-size: 1.1rem; letter-spacing: .14em; text-transform: uppercase; opacity: .7; }
+.scard__cta { margin-top: .8rem; }
+
+/* Card final: retrato à direita, texto à esquerda — como no card da
+   jornada, para não chapar a foto atrás do texto e apagar o rosto. */
+.scard__img {
+  position: absolute;
+  inset: 0 0 0 auto;
+  width: 50%;
+  height: 100%;
+  object-fit: cover;
+  /* Foto vertical: centrada nela, com o rosto no terço de cima. */
+  object-position: 50% 18%;
+}
+.scard--photo::after {
+  content: "";
+  position: absolute;
+  top: 0; bottom: 0;
+  left: 44%;
+  width: 14%;
+  background: linear-gradient(to right, var(--scard-bg), transparent);
+  pointer-events: none;
+}
+.scard--photo .scard__body { max-width: 50%; border-top: 0; padding-top: 0; }
+
+@media (max-width: 900px) {
+  /* A barra flutuante de contato cobre o rodapé da tela. */
+  /* Sem prender: a seção tem a altura do conteúdo, não da tela. */
+  .symptoms__pin { min-height: 0; padding-block: var(--sec-y); gap: 2.4rem; }
+  .symptoms__hint { display: block; }
+  .symptoms__head { flex-direction: column; align-items: stretch; gap: 1.2rem; }
+  .symptoms__head h2 { font-size: clamp(2.6rem, 7vw, 4rem); }
+  .symptoms__meter { max-width: none; min-width: 0; padding-bottom: 0; }
+
+  .scard { width: 82vw; min-height: 0; padding: clamp(2.2rem, 5.5vw, 3rem); }
+  .scard__idx { font-size: clamp(3.6rem, 12vw, 5.2rem); }
+  .scard__q--lg { font-size: clamp(2.8rem, 8vw, 3.8rem); }
+
+  /* No card final o retrato vira o fundo inteiro, com véu subindo do
+     rodapé só até onde o texto vai. */
+  .scard--photo { width: 86vw; min-height: 56svh; }
+  .scard__img { inset: 0; width: 100%; }
+  .scard--photo::after {
+    inset: 0;
+    left: 0;
+    width: auto;
+    background: linear-gradient(to top, var(--c-ink) 18%, rgba(21, 58, 50, .86) 48%, rgba(21, 58, 50, .2) 72%, transparent 88%);
+  }
+  .scard--photo .scard__body { max-width: none; }
+}
 
 /* =============================================================
    4. JORNADA — seção que prende e troca os cards
@@ -395,7 +811,11 @@
   gap: 2.4rem 4rem;
 }
 .journey__head .label { color: var(--c-brand); display: block; margin-bottom: 1.2rem; }
-.journey__head h2 { max-width: 16ch; }
+/* O título mora numa faixa de altura fixa (--jhead) que fica presa no
+   topo: ele precisa caber nela em uma ou duas linhas, senão transborda
+   e os cards passam por cima. Por isso o tamanho segue também a
+   altura da tela, e não só a largura. */
+.journey__head h2 { max-width: 24ch; font-size: clamp(2.8rem, min(3.8vw, 5.4vh), 5.6rem); line-height: 1; }
 
 .journey__meter {
   display: flex;
@@ -410,7 +830,7 @@
   font-size: var(--t-sm);
   font-weight: 600;
   letter-spacing: .1em;
-  font-variant-numeric: tabular-nums;
+  font-variant-numeric: lining-nums tabular-nums;
   color: var(--c-brand);
 }
 .journey__bar {
@@ -471,7 +891,7 @@
   box-shadow: 0 -2.4rem 8rem -2.4rem rgba(0, 0, 0, .6);
 }
 
-/* Rodízio de cor: claro, foto, teal profundo, coral, foto. */
+/* Rodízio de cor: sálvia claro, foto, sálvia, cobre, foto. */
 .jcard--soft   { --jcard-bg: var(--c-brand-soft); --jcard-fg: var(--c-ink); }
 .jcard--deep   { --jcard-bg: var(--c-brand-deep); --jcard-fg: var(--c-white); }
 .jcard--accent { --jcard-bg: var(--c-accent);     --jcard-fg: var(--c-ink); }
@@ -504,6 +924,10 @@
   object-fit: cover;
   object-position: 50% 22%;
 }
+/* As fotos da marca são horizontais: cada uma diz onde a Dra.
+   Isabela está no quadro, para o corte não cair na parede. */
+.jcard__img--blazer      { object-position: 88% 20%; }
+.jcard__img--consultorio { object-position: 90% 22%; }
 .jcard--photo::after {
   content: "";
   position: absolute;
@@ -527,7 +951,7 @@
   font-size: clamp(5rem, 7vw, 10rem);
   font-weight: 600;
   line-height: .78;
-  letter-spacing: -0.04em;
+  letter-spacing: -0.018em;
   opacity: .3;
 }
 .jcard--photo .jcard__idx { opacity: .5; }
@@ -549,7 +973,7 @@
 .jcard__title {
   font-size: clamp(3.2rem, 5vw, 7rem);
   line-height: .98;
-  letter-spacing: -0.035em;
+  letter-spacing: -0.016em;
 }
 .jcard__text {
   font-size: var(--t-lead);
@@ -594,8 +1018,8 @@
     width: auto;
     background: linear-gradient(to top,
       var(--c-ink) 4%,
-      rgba(6, 35, 42, .82) 38%,
-      rgba(6, 35, 42, .25) 62%,
+      rgba(21, 58, 50, .82) 38%,
+      rgba(21, 58, 50, .25) 62%,
       transparent 82%);
   }
   .jcard--photo { --jcard-bg: var(--c-ink); }
@@ -630,7 +1054,7 @@
   padding: .5rem;
   border-radius: 70rem;
   background: var(--c-paper-2);
-  box-shadow: inset 0 0 0 1px rgba(6, 35, 42, .1);
+  box-shadow: inset 0 0 0 1px rgba(21, 58, 50, .1);
 }
 .toggle__pill {
   position: absolute;
@@ -689,7 +1113,7 @@
   padding: clamp(2.4rem, 2.6vw, 3.4rem);
   border-radius: var(--radius-lg);
   background: var(--c-white);
-  box-shadow: inset 0 0 0 1px rgba(6, 35, 42, .09);
+  box-shadow: inset 0 0 0 1px rgba(21, 58, 50, .09);
   overflow: hidden;
   transition: background-color .5s var(--ease), color .5s var(--ease),
               transform .5s var(--ease-out), box-shadow .5s var(--ease);
@@ -754,16 +1178,15 @@
 .conditions__panel[hidden] { display: none; }
 
 /* =============================================================
-   6. NÚMEROS
-   Três dados verificáveis, em escala tipográfica de manchete.
-   Nenhuma estatística inventada: reputação nas plataformas,
-   faixa etária atendida e janela de suporte.
+   6. CIRURGIA ROBÓTICA
+   Como é operar com o robô: um parágrafo que explica o console e,
+   embaixo, três fotos do equipamento, cada uma sobre o dado que ela
+   mostra — visor 3D (ampliação), controles (pinças), braços sobre a
+   mesa (incisões). Dados tirados do texto da própria médica.
    ============================================================= */
 
-/* Faixa de dados: um respiro entre dois blocos densos, nao uma
-   secao inteira. Por isso ela ignora o --sec-y global. */
 .numbers {
-  padding-block: clamp(5rem, 7vw, 9rem);
+  padding-block: clamp(7rem, 9vw, 12rem);
   background: var(--c-brand-deep);
   color: var(--c-white);
   overflow: hidden;
@@ -774,6 +1197,37 @@
   gap: clamp(2.4rem, 4vw, 6rem);
 }
 @media (max-width: 860px) { .numbers__grid { grid-template-columns: 1fr; } }
+
+.numbers__head {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, .9fr);
+  align-items: end;
+  gap: clamp(2.4rem, 5vw, 8rem);
+  margin-bottom: clamp(4rem, 5vw, 7rem);
+}
+.numbers__head .label { display: block; margin-bottom: 1.6rem; color: #c8b898; }
+.numbers__head h2 { max-width: 18ch; font-size: clamp(3.2rem, 4.2vw, 6.2rem); }
+.numbers__head p { max-width: 46ch; color: rgba(255, 255, 255, .78); }
+@media (max-width: 900px) { .numbers__head { grid-template-columns: 1fr; } }
+
+/* Fotos verticais do equipamento, recortadas em 4:5 — altas o bastante
+   para mostrar o robô, sem empurrar o número para fora da tela. */
+.numbers__photo {
+  margin: 0 0 1.2rem;
+  overflow: hidden;
+  border-radius: var(--radius-lg);
+  box-shadow: 0 2.4rem 5rem -2.4rem rgba(0, 0, 0, .45);
+}
+.numbers__photo img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  object-fit: cover;
+}
+.numbers__photo--1 img { object-position: 55% 38%; }
+.numbers__photo--2 img { object-position: 50% 42%; }
+.numbers__photo--3 img { object-position: 50% 38%; }
+@media (max-width: 860px) { .numbers__photo img { aspect-ratio: 4 / 3; } }
 
 /* A borda fica na caixa de fora e o recorte também: assim o conteúdo
    sobe de trás da linha, e não de trás do nada. */
@@ -787,12 +1241,168 @@
   font-size: clamp(5.6rem, 9vw, 13rem);
   font-weight: 500;
   line-height: .84;
-  letter-spacing: -0.05em;
-  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.023em;
+  font-variant-numeric: lining-nums tabular-nums;
 }
 .numbers__item b sup { font-size: .34em; vertical-align: super; letter-spacing: 0; }
 .numbers__item h4 { font-family: var(--f-sans); font-weight: 600; font-size: var(--t-lead); }
 .numbers__item p { color: rgba(255, 255, 255, .72); font-size: var(--t-sm); max-width: 32ch; }
+
+/* =============================================================
+   6b. OS 3 MEDOS — seção que prende e troca os cards (desktop)
+   Título à esquerda, foto no centro e a pilha de cards à direita,
+   com os cards exatamente do tamanho da foto. No desktop o JS prende
+   a seção (.is-pinned) e cada card sobe por cima do anterior; sem JS,
+   com movimento reduzido ou no celular, os cards seguem em coluna.
+   ============================================================= */
+
+.fears {
+  --fear-h: clamp(52rem, 74vh, 76rem);
+  --fear-h: clamp(52rem, 74svh, 76rem);
+
+  position: relative;
+  background: var(--c-paper-2);
+  padding-block: var(--sec-y);
+}
+
+.fears__stage {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: clamp(2.4rem, 3vw, 4.8rem);
+}
+
+.fears__head { display: grid; gap: 2.4rem; align-content: center; }
+.fears__head .label { color: var(--c-brand-deep); }
+.fears__head h2 { max-width: 12ch; font-size: clamp(3.2rem, 4vw, 6rem); }
+.fears__head p { max-width: 36ch; color: var(--c-muted-on-light); }
+
+.fears__meter { display: flex; align-items: center; gap: 1.6rem; max-width: 30rem; }
+.fears__count {
+  font-family: var(--f-display);
+  font-size: var(--t-sm);
+  letter-spacing: .1em;
+  font-variant-numeric: lining-nums tabular-nums;
+  color: var(--c-brand-deep);
+}
+.fears__bar { flex: 1; height: 1px; background: rgba(21, 58, 50, .16); overflow: hidden; }
+.fears__bar i {
+  display: block;
+  height: 100%;
+  background: var(--c-accent);
+  transform-origin: 0 50%;
+  transform: scaleX(var(--p, 0));
+}
+
+/* Foto e card compartilham a mesma caixa: altura fixa e largura de
+   2:3, com piso de 44rem — abaixo disso o texto do card mais longo
+   (anestesia) não cabe na altura e seria cortado. */
+.fears {
+  --fear-w: max(calc(var(--fear-h) * 2 / 3), 44rem);
+}
+.fears__photo,
+.fcard {
+  width: var(--fear-w);
+  height: var(--fear-h);
+  border-radius: var(--radius-xl);
+}
+.fears__photo {
+  margin: 0;
+  overflow: hidden;
+  box-shadow: 0 3rem 7rem -3.6rem rgba(21, 58, 50, .45);
+}
+.fears__photo img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 18%;
+}
+
+/* Sem JS: pilha em coluna ao lado da foto. Presa pelo JS: os cards se
+   sobrepõem na mesma caixa e o que chega sobe de baixo, recortado
+   pela borda do baralho. */
+.fears__deck { display: grid; gap: 2.4rem; }
+.fears.is-pinned .fears__deck {
+  position: relative;
+  width: var(--fear-w);
+  height: var(--fear-h);
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+}
+.fears.is-pinned .fcard { position: absolute; inset: 0; width: auto; height: auto; }
+.fears.is-pinned { padding-block: 0; }
+.fears.is-pinned .fears__stage { min-height: 100svh; }
+
+/* ---- Card ---- */
+.fcard {
+  --fcard-bg: var(--c-white);
+  --fcard-fg: var(--c-text-on-light);
+  --fcard-idx: var(--c-accent-deep);
+
+  display: flex;
+  flex-direction: column;
+  gap: clamp(1.2rem, 1.6vh, 2rem);
+  padding: clamp(2.4rem, 2.4vw, 3.6rem);
+  background: var(--fcard-bg);
+  color: var(--fcard-fg);
+  box-shadow: inset 0 0 0 1px rgba(21, 58, 50, .08);
+  overflow: hidden;
+  transform-origin: 50% 0;
+  will-change: transform;
+}
+.fcard--soft { --fcard-bg: var(--c-brand-soft); --fcard-idx: var(--c-brand-deep); }
+.fcard--ink  { --fcard-bg: var(--c-ink); --fcard-fg: var(--c-text-on-dark); --fcard-idx: #c8b898; box-shadow: none; }
+
+.fcard__top { display: flex; align-items: baseline; justify-content: space-between; gap: 1.2rem; }
+.fcard__idx {
+  font-family: var(--f-display);
+  font-size: clamp(4.4rem, 4.6vw, 7rem);
+  font-style: italic;
+  line-height: .8;
+  color: var(--fcard-idx);
+}
+.fcard__tag {
+  font-size: 1.05rem;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  padding: .6rem 1.2rem;
+  border-radius: 70rem;
+  box-shadow: inset 0 0 0 1px currentColor;
+  opacity: .75;
+  text-align: right;
+}
+.fcard__q {
+  font-size: clamp(2.2rem, 2vw, 3rem);
+  line-height: 1.1;
+  text-wrap: balance;
+}
+.fcard__body {
+  display: grid;
+  gap: 1rem;
+  margin-top: auto;
+  padding-top: 1.4rem;
+  border-top: 1px solid rgba(128, 128, 128, .22);
+  border-top: 1px solid color-mix(in srgb, currentColor 18%, transparent);
+}
+.fcard__body p { font-size: 1.35rem; line-height: 1.55; opacity: .86; }
+.fcard__body strong { font-weight: 700; opacity: 1; }
+
+/* Tablet: o título sobe e foto + cards ficam lado a lado embaixo. */
+@media (max-width: 1200px) {
+  .fears { --fear-h: clamp(48rem, 64svh, 64rem); }
+  .fears__stage { grid-template-columns: auto auto; justify-content: center; }
+  .fears__head { grid-column: 1 / -1; }
+  .fears__head h2 { max-width: 20ch; }
+}
+
+/* Celular: sem prender. Foto em cima e os cards em coluna, cada um
+   com a altura do próprio texto. */
+@media (max-width: 900px) {
+  .fears__stage { grid-template-columns: 1fr; }
+  .fears__photo { height: auto; width: 100%; aspect-ratio: 4 / 5; }
+  .fcard { width: auto; height: auto; }
+}
 
 /* =============================================================
    7. SOBRE
@@ -831,7 +1441,8 @@
   width: 100%;
   aspect-ratio: 3 / 4;
   object-fit: cover;
-  object-position: 50% 12%;
+  /* Foto vertical na mesma proporção da moldura: aparece inteira. */
+  object-position: 50% 30%;
   will-change: transform;
 }
 
@@ -887,13 +1498,13 @@
 .about__cta { display: flex; justify-content: center; }
 
 /* Qualificações: lista numerada, sem ícone genérico de "check". */
-.quals { display: grid; gap: 0; border-top: 1px solid rgba(6, 35, 42, .14); }
+.quals { display: grid; gap: 0; border-top: 1px solid rgba(21, 58, 50, .14); }
 .quals li {
   display: grid;
   grid-template-columns: 3.6rem 1fr;
   gap: 1.6rem;
   padding: 1.8rem 0;
-  border-bottom: 1px solid rgba(6, 35, 42, .14);
+  border-bottom: 1px solid rgba(21, 58, 50, .14);
   transition: padding-left .4s var(--ease-out), color .4s var(--ease);
 }
 .quals li::before {
@@ -911,150 +1522,6 @@
 }
 
 /* =============================================================
-   8. FERRAMENTA ABCDE
-   Autoexame guiado. Não diagnostica e diz isso com todas as
-   letras — é um funil de conscientização que termina em consulta.
-   Interativo porque ler cinco critérios é diferente de aplicá-los
-   na própria pinta.
-   ============================================================= */
-
-.abcde { background: var(--c-ink); color: var(--c-text-on-dark); overflow: hidden; }
-
-.abcde__grid {
-  display: grid;
-  grid-template-columns: .85fr 1.15fr;
-  gap: clamp(3rem, 6vw, 8rem);
-  /* Centralizado: a coluna da esquerda é curta e o painel é alto;
-     alinhar pelo topo deixaria meia tela de vazio embaixo. */
-  align-items: center;
-}
-@media (max-width: 1000px) { .abcde__grid { grid-template-columns: 1fr; } }
-
-.abcde__intro { display: grid; gap: 2.4rem; }
-.abcde__intro .label { color: var(--c-brand); }
-.abcde__intro h2 { max-width: 13ch; }
-.abcde__intro p { color: var(--c-muted-on-dark); max-width: 44ch; }
-
-.abcde__disclaimer {
-  display: grid;
-  gap: .8rem;
-  padding: 2rem 2.4rem;
-  border-radius: var(--radius);
-  background: rgba(244, 147, 104, .1);
-  box-shadow: inset 0 0 0 1px rgba(244, 147, 104, .3);
-  font-size: var(--t-sm);
-  color: var(--c-accent-soft);
-}
-.abcde__disclaimer strong { color: var(--c-accent); font-weight: 600; }
-
-.abcde__panel {
-  padding: clamp(2.4rem, 3.4vw, 4rem);
-  border-radius: var(--radius-xl);
-  background: var(--c-ink-2);
-  box-shadow: inset 0 0 0 1px var(--c-ink-3);
-}
-
-.abcde__list { display: grid; gap: 1rem; margin-bottom: clamp(2.4rem, 3vw, 3.2rem); }
-
-/* Cada critério é um checkbox real por baixo — teclado, leitor de
-   tela e formulário funcionam sem JS extra. O visual é do label. */
-.crit { position: relative; }
-.crit input {
-  position: absolute;
-  opacity: 0;
-  width: 100%; height: 100%;
-  margin: 0;
-  cursor: pointer;
-}
-.crit__face {
-  display: grid;
-  grid-template-columns: 4.4rem 1fr auto;
-  gap: 1.8rem;
-  align-items: center;
-  padding: 1.8rem 2rem;
-  border-radius: var(--radius);
-  background: rgba(255, 255, 255, .03);
-  box-shadow: inset 0 0 0 1px var(--c-ink-3);
-  transition: background-color .35s var(--ease), box-shadow .35s var(--ease);
-  pointer-events: none;
-}
-.crit input:hover + .crit__face { background: rgba(255, 255, 255, .06); }
-.crit input:focus-visible + .crit__face { box-shadow: inset 0 0 0 2px var(--c-accent); }
-.crit input:checked + .crit__face {
-  background: rgba(244, 147, 104, .12);
-  box-shadow: inset 0 0 0 1px var(--c-accent);
-}
-
-.crit__letter {
-  display: grid;
-  place-items: center;
-  width: 4.4rem; height: 4.4rem;
-  border-radius: 50%;
-  background: var(--c-ink);
-  box-shadow: inset 0 0 0 1px var(--c-ink-3);
-  font-family: var(--f-display);
-  font-size: 1.9rem;
-  font-weight: 600;
-  color: var(--c-brand);
-  transition: background-color .35s var(--ease), color .35s var(--ease);
-}
-.crit input:checked + .crit__face .crit__letter { background: var(--c-accent); color: var(--c-ink); }
-
-.crit__text b { display: block; font-weight: 600; margin-bottom: .2rem; }
-.crit__text span { font-size: var(--t-sm); color: var(--c-muted-on-dark); }
-
-.crit__box {
-  width: 2.4rem; height: 2.4rem;
-  border-radius: .6rem;
-  box-shadow: inset 0 0 0 1px rgba(143, 176, 182, .55);
-  display: grid;
-  place-items: center;
-  color: transparent;
-  transition: background-color .3s var(--ease), color .3s var(--ease);
-}
-.crit__box svg { width: 1.3rem; height: 1.3rem; }
-.crit input:checked + .crit__face .crit__box { background: var(--c-accent); color: var(--c-ink); }
-
-/* Resultado: muda de cor e de texto conforme a contagem. Três
-   níveis, nunca um "diagnóstico". */
-.abcde__result {
-  display: grid;
-  gap: 1.6rem;
-  padding: clamp(2.4rem, 3vw, 3.2rem);
-  border-radius: var(--radius-lg);
-  background: var(--c-ink);
-  box-shadow: inset 0 0 0 1px var(--c-ink-3);
-}
-.abcde__meter { display: flex; gap: .6rem; }
-.abcde__meter i {
-  flex: 1;
-  height: .5rem;
-  border-radius: 70rem;
-  background: var(--c-ink-3);
-  transition: background-color .4s var(--ease);
-}
-.abcde__meter i.on { background: var(--c-accent); }
-
-.abcde__result-title {
-  font-family: var(--f-display);
-  font-size: clamp(2rem, 2.6vw, 3rem);
-  font-weight: 600;
-  letter-spacing: -0.03em;
-  line-height: 1.1;
-}
-.abcde__result p { color: var(--c-muted-on-dark); font-size: var(--t-sm); max-width: 52ch; }
-.abcde__result[data-level="1"] .abcde__result-title { color: var(--c-brand); }
-.abcde__result[data-level="2"] .abcde__result-title { color: var(--c-accent); }
-.abcde__result[data-level="3"] .abcde__result-title { color: var(--c-accent); }
-.abcde__actions {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 1.2rem;
-  margin-top: .8rem;
-}
-
-/* =============================================================
    9. DEPOIMENTOS
    Um depoimento por vez, em corpo grande. Bloco de citações
    pequenas em três colunas vira ruído; uma fala inteira,
@@ -1067,8 +1534,13 @@
 .voices {
   background: var(--c-paper-2);
   min-height: 100vh;
+  min-height: 100svh;
   display: flex;
   align-items: center;
+  /* Respiro proporcional à altura da tela, e não o --sec-y do site: a
+     seção inteira (título, fala e assinatura) precisa caber numa tela
+     só enquanto está presa — senão o pin para com a fala cortada. */
+  padding-block: clamp(6rem, 9vh, 10rem);
 }
 /* Mesmo motivo da jornada: a barra de contato cobre o rodapé. */
 @media (max-width: 900px) { .voices { padding-bottom: calc(var(--sec-y) + 6rem); } }
@@ -1079,8 +1551,9 @@
   align-items: flex-end;
   justify-content: space-between;
   gap: 2.4rem;
-  margin-bottom: clamp(3.2rem, 5vw, 6rem);
+  margin-bottom: clamp(2.4rem, 4vh, 5rem);
 }
+.voices__head h2 { font-size: clamp(3.2rem, min(4.6vw, 7vh), 6.8rem); }
 .voices__head .label { color: var(--c-brand-deep); display: block; margin-bottom: 1.6rem; }
 
 .voices__nav { display: flex; align-items: center; gap: 1.2rem; }
@@ -1089,7 +1562,7 @@
   font-size: var(--t-sm);
   font-weight: 600;
   letter-spacing: .1em;
-  font-variant-numeric: tabular-nums;
+  font-variant-numeric: lining-nums tabular-nums;
   color: var(--c-muted-on-light);
   min-width: 6rem;
   text-align: center;
@@ -1100,7 +1573,7 @@
   /* Altura reservada para o depoimento mais longo: os slides são
      absolutos, então sem isso o palco colapsa e a seção salta a cada
      troca. */
-  min-height: clamp(30rem, 42vh, 44rem);
+  min-height: clamp(24rem, 36vh, 40rem);
 }
 
 .voice {
@@ -1123,10 +1596,12 @@
 
 .voice__quote {
   font-family: var(--f-display);
-  font-size: clamp(2.2rem, 3.4vw, 4.6rem);
+  /* Limitada também pela altura: a fala mais longa tem seis linhas e
+     precisa caber na tela presa junto com o título. */
+  font-size: clamp(2.2rem, min(3.4vw, 5.2vh), 4.6rem);
   font-weight: 400;
   line-height: 1.14;
-  letter-spacing: -0.032em;
+  letter-spacing: -0.014em;
   max-width: 24ch;
   text-wrap: balance;
 }
@@ -1138,71 +1613,12 @@
   padding: .5rem 1.2rem;
   border-radius: 70rem;
   background: var(--c-white);
-  box-shadow: inset 0 0 0 1px rgba(6, 35, 42, .1);
+  box-shadow: inset 0 0 0 1px rgba(21, 58, 50, .1);
   font-size: 1.2rem;
   color: var(--c-muted-on-light);
 }
 .voice__stars { display: flex; gap: .3rem; color: var(--c-accent); }
 .voice__stars svg { width: 1.5rem; height: 1.5rem; }
-
-/* =============================================================
-   10. COMO É A CONSULTA
-   Os benefícios reais do atendimento, em lista editorial. Cada
-   linha cresce ao passar o mouse — a página responde ao leitor
-   sem precisar de oito cards idênticos.
-   ============================================================= */
-
-.care { background: var(--c-paper); }
-
-.care__grid {
-  display: grid;
-  grid-template-columns: .8fr 1.2fr;
-  gap: clamp(3rem, 6vw, 8rem);
-}
-@media (max-width: 1000px) { .care__grid { grid-template-columns: 1fr; } }
-
-.care__aside-inner { position: sticky; top: 14rem; display: grid; gap: 2.4rem; }
-@media (max-width: 1000px) { .care__aside-inner { position: relative; top: 0; } }
-.care__aside .label { color: var(--c-brand-deep); }
-.care__aside h2 { max-width: 12ch; }
-.care__aside p { color: var(--c-muted-on-light); max-width: 40ch; }
-
-.care__list { border-top: 1px solid rgba(6, 35, 42, .14); }
-.care__item {
-  position: relative;
-  display: grid;
-  grid-template-columns: 1fr auto;
-  gap: 2.4rem;
-  align-items: baseline;
-  padding: clamp(2rem, 2.6vw, 2.8rem) 0;
-  border-bottom: 1px solid rgba(6, 35, 42, .14);
-  transition: color .4s var(--ease);
-}
-/* Traço coral que cresce da esquerda: marca a linha lida sem
-   mexer no layout (nada empurra, nada salta). */
-.care__item::before {
-  content: "";
-  position: absolute;
-  left: 0; bottom: -1px;
-  height: 1px; width: 100%;
-  background: var(--c-accent);
-  transform: scaleX(0);
-  transform-origin: 0 50%;
-  transition: transform .6s var(--ease-out);
-}
-@media (hover: hover) and (pointer: fine) {
-  .care__item:hover { color: var(--c-brand-deep); }
-  .care__item:hover::before { transform: scaleX(1); }
-}
-.care__item h4 { font-family: var(--f-sans); font-weight: 600; font-size: var(--t-lead); margin-bottom: .4rem; }
-.care__item p { color: var(--c-muted-on-light); font-size: var(--t-sm); max-width: 52ch; }
-.care__item b {
-  font-family: var(--f-display);
-  font-size: 1.3rem;
-  font-weight: 600;
-  color: var(--c-accent);
-  letter-spacing: .06em;
-}
 
 /* =============================================================
    11. FAQ
@@ -1238,7 +1654,9 @@
   overflow: hidden;
 }
 .band--ink { background: var(--c-ink); color: var(--c-text-on-dark); }
-.band--brand { background: var(--c-brand); color: var(--c-ink); }
+/* Repete o esmeralda do hero no meio da página: a assinatura volta
+   uma vez, em faixa, antes do bloco escuro. */
+.band--brand { background: var(--c-hero); color: var(--c-hero-ink); }
 
 /* Sem movimento: a seção deixa de ser fixada e vira leitura
    linear. O espaçador de 4 telas some junto, senão sobraria um

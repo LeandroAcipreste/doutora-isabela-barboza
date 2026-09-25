@@ -1,7 +1,7 @@
 /**
  * Preloader.
  *
- * Acompanha o carregamento real das imagens marcadas com
+ * Acompanha o carregamento real das imagens e vídeos marcados com
  * [data-preload] — nada de temporizador fingindo progresso. Em
  * conexão rápida a cortina sai quase imediatamente; em conexão
  * ruim ela segura a página até a primeira tela estar pronta.
@@ -19,7 +19,7 @@ export function initPreloader(onDone = () => {}) {
 
   const bar = loader.querySelector('[data-loader-bar]');
   const count = loader.querySelector('[data-loader-count]');
-  const images = [...document.querySelectorAll('img[data-preload]')];
+  const images = [...document.querySelectorAll('img[data-preload], video[data-preload]')];
 
   document.body.classList.add('is-locked');
 
@@ -64,11 +64,15 @@ export function initPreloader(onDone = () => {}) {
   if (!images.length) {
     finish();
   } else {
-    images.forEach((img) => {
-      if (img.complete && img.naturalWidth) bump();
+    images.forEach((media) => {
+      // Vídeo conta como pronto quando já tem o primeiro quadro
+      // (readyState 2), não quando termina de baixar.
+      const isVideo = media.tagName === 'VIDEO';
+      const ready = isVideo ? media.readyState >= 2 : media.complete && media.naturalWidth;
+      if (ready) bump();
       else {
-        img.addEventListener('load', bump, { once: true });
-        img.addEventListener('error', bump, { once: true });
+        media.addEventListener(isVideo ? 'loadeddata' : 'load', bump, { once: true });
+        media.addEventListener('error', bump, { once: true });
       }
     });
   }

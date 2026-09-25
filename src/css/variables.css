@@ -1,39 +1,44 @@
 /* =============================================================
-   DESIGN TOKENS — Dr. Marcos Daniel Seabra
-   Paleta amostrada da logo da marca (turquesa #35B3C1, teal
-   profundo #2D818B, coral #F49368). O "ink" é um teal quase
-   preto: mantém a temperatura da marca no fundo escuro em vez
-   de cair num cinza neutro genérico.
+   DESIGN TOKENS — Dra. Isabela Barboza
+   Direção do design system (desginsystem/isabela-hero): marfim,
+   verde profundo e detalhes champanhe, num registro editorial e
+   sóbrio. O esmeralda #3CB87C continua como cor de assinatura em
+   pontos isolados (card de abertura dos sintomas, faixa de
+   transição) — nunca como fundo de bloco de texto corrido.
    ============================================================= */
 
 :root {
   /* ---- Cor ---- */
-  --c-ink:            #06232a;   /* fundo escuro dominante          */
-  --c-ink-2:          #0b3038;   /* elevação dentro do escuro       */
-  --c-ink-3:          #124049;   /* bordas/divisores no escuro      */
+  --c-hero:           #3cb87c;   /* esmeralda de assinatura         */
+  --c-hero-ink:       #153a32;   /* texto sobre marfim e esmeralda  */
 
-  --c-paper:          #f7f4f0;   /* off-white quente = fundo claro  */
-  --c-paper-2:        #efeae4;   /* elevação dentro do claro        */
-  --c-white:          #ffffff;
+  --c-ink:            #153a32;   /* verde profundo (seções escuras) */
+  --c-ink-2:          #1c4a40;   /* elevação dentro do escuro       */
+  --c-ink-3:          #2c5e52;   /* bordas/divisores no escuro      */
 
-  --c-brand:          #35b3c1;   /* turquesa da logo (primária)     */
-  --c-brand-deep:     #2d818b;   /* teal escuro da logo             */
-  --c-brand-soft:     #d7eff2;   /* turquesa lavado                 */
+  --c-paper:          #f3f0e9;   /* marfim = fundo claro dominante  */
+  --c-paper-2:        #ebe6db;   /* marfim mais quente              */
+  --c-white:          #fbf9f4;   /* papel: cards e texto no escuro  */
+  --c-line:           #d9d6ca;   /* filetes sobre o marfim          */
 
-  --c-accent:         #f49368;   /* coral da logo (acento quente)   */
-  --c-accent-deep:    #d9714a;
-  --c-accent-soft:    #fce7dc;
+  --c-brand:          #8fc2ab;   /* verde claro (texto no escuro)   */
+  --c-brand-deep:     #285e4f;   /* verde médio (texto no claro)    */
+  --c-brand-soft:     #dfe8e2;   /* verde lavado                    */
 
-  --c-text-on-dark:   #eef6f7;
-  --c-muted-on-dark:  #8fb0b6;
-  --c-text-on-light:  #06232a;
-  --c-muted-on-light: #5c7076;
+  --c-accent:         #a58c62;   /* champanhe                       */
+  --c-accent-deep:    #8b7553;   /* champanhe escuro (texto/hover)  */
+  --c-accent-soft:    #efe6d6;
 
-  --c-focus:          #f49368;
+  --c-text-on-dark:   #f4f1e8;
+  --c-muted-on-dark:  #b3c6bd;
+  --c-text-on-light:  #153a32;
+  --c-muted-on-light: #586e65;
+
+  --c-focus:          #a58c62;
 
   /* ---- Tipografia ---- */
-  --f-display: 'Fraunces', 'Iowan Old Style', Georgia, serif;
-  --f-sans:    'Geist', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --f-display: 'P052', 'Palatino Linotype', Palatino, Georgia, serif;
+  --f-sans:    'Nimbus Sans', 'Helvetica Neue', Arial, sans-serif;
 
   /* Escala tipográfica em rem — a raiz é fluida (ver base.css),
      então todo o layout escala proporcionalmente com a viewport. */

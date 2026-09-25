@@ -13,13 +13,17 @@
    dentro dela. Fatiar por PALAVRA em vez de por LINHA preserva o
    <em>/<mark>/<a> que estiver no meio da frase e nao precisa ser
    refeito a cada redimensionamento. O padding-bottom existe para
-   a mascara nao cortar a perna do g, do p e do ç. */
+   a mascara nao cortar a perna do g, do p e do ç; o de cima, para
+   não decapitar acento em maiúscula e circunflexo (ê, ô, â) com a
+   entrelinha apertada dos títulos; o lateral, para a itálica, que
+   avança além da própria caixa. As margens negativas devolvem o
+   espaço, então nada se mexe no layout. */
 .w {
   display: inline-block;
   overflow: hidden;
   vertical-align: top;
-  padding-bottom: .14em;
-  margin-bottom: -.14em;
+  padding: .12em .08em .14em;
+  margin: -.12em -.08em -.14em;
 }
 /* Palavra + pontuação viajam juntas. Sem isso o navegador quebra a
    linha entre os dois inline-block e o sinal abre a linha seguinte. */
@@ -83,11 +87,13 @@
 /* A imagem sob a cortina começa maior e assenta: o quadro abre e a
    foto se acomoda, em vez de simplesmente surgir. */
 [data-clip] img,
+[data-clip] video,
 [data-clip] .media__inner {
   transform: scale(1.16);
   transition: transform 1.4s var(--ease-out);
 }
 [data-clip].is-in img,
+[data-clip].is-in video,
 [data-clip].is-in .media__inner { transform: scale(1); }
 
 /* 4. Salto de dentro de uma máscara ---------------------------

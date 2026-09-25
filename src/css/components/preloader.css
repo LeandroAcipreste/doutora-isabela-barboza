@@ -34,7 +34,7 @@
 
 .loader__mark {
   width: clamp(6rem, 8vw, 9rem);
-  filter: drop-shadow(0 1rem 3rem rgba(53, 179, 193, .35));
+  filter: drop-shadow(0 1rem 3rem rgba(143, 194, 171, .35));
   animation: loader-breathe 2.4s var(--ease) infinite;
 }
 @keyframes loader-breathe {
@@ -63,5 +63,5 @@
   font-size: 1.4rem;
   letter-spacing: 0.14em;
   color: var(--c-muted-on-dark);
-  font-variant-numeric: tabular-nums;
+  font-variant-numeric: lining-nums tabular-nums;
 }

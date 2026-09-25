@@ -8,6 +8,7 @@
 
 import { clamp, prefersReducedMotion } from '../../js/utils/motion.js';
 import { getScroll } from '../../js/libs/gsap-setup.js';
+import { splitLetters } from '../../js/utils/split.js';
 
 /* -------------------------------------------------------------
    JORNADA — a seção prende e os cards passam um a um
@@ -120,6 +121,182 @@ function initJourney() {
 }
 
 /* -------------------------------------------------------------
+   FOTO QUE SE LEVANTA — abertura
+   A foto entra deitada (tombada para trás, dobrada na base) e fica de
+   pé no ritmo da rolagem: começa quando o topo dela aparece na tela e
+   termina quando chega perto do meio. Amarrada ao scroll, ela volta a
+   deitar se a pessoa rola para cima — o gesto se repete a cada
+   passagem, como o resto do site.
+   ------------------------------------------------------------- */
+const STANDUP_TILT = 72; // graus de tombo no início
+
+function initStandUp() {
+  const alvos = [...document.querySelectorAll('[data-standup]')];
+  if (!alvos.length || prefersReducedMotion()) return;
+
+  const motor = getScroll();
+  if (!motor) return;
+
+  const { gsap } = motor;
+
+  alvos.forEach((figura) => {
+    const img = figura.querySelector('img');
+    if (!img) return;
+
+    gsap.fromTo(img,
+      { rotateX: STANDUP_TILT, opacity: 0.35 },
+      {
+        rotateX: 0,
+        opacity: 1,
+        ease: 'none',
+        scrollTrigger: {
+          trigger: figura,
+          start: 'top bottom',
+          end: 'top 45%',
+          scrub: 0.6,
+          invalidateOnRefresh: true,
+        },
+      }
+    );
+  });
+}
+
+/* -------------------------------------------------------------
+   SINTOMAS — a seção prende e os cards passam na horizontal
+
+   A rolagem vertical vira deslocamento horizontal da fila: o pin
+   segura a seção pelo tempo exato de a fila inteira atravessar a
+   tela (a distância é a sobra da fila além da largura visível).
+   Com movimento reduzido ou sem GSAP, nada disso roda e o CSS
+   mantém a fila como rolagem horizontal nativa com encaixe.
+   ------------------------------------------------------------- */
+function initSymptoms() {
+  const root = document.querySelector('[data-symptoms]');
+  if (!root) return;
+
+  const viewport = root.querySelector('[data-symptoms-viewport]');
+  const track = root.querySelector('[data-symptoms-track]');
+  const bar = root.querySelector('[data-symptoms-progress]');
+  const count = root.querySelector('[data-symptoms-count]');
+  if (!viewport || !track || prefersReducedMotion()) return;
+
+  const motor = getScroll();
+  if (!motor) return;
+
+  const { gsap } = motor;
+  const total = track.children.length;
+  const pad = (n) => String(n).padStart(2, '0');
+  const distancia = () => Math.max(0, track.scrollWidth - viewport.clientWidth);
+
+  const mm = gsap.matchMedia();
+
+  // No celular a seção não prende: o texto dos cards não cabe entre o
+  // título e a barra de contato. Lá a fila é deslizada com o dedo
+  // (rolagem horizontal nativa com encaixe) e o contador acompanha.
+  viewport.addEventListener('scroll', () => {
+    if (root.classList.contains('is-pinned')) return;
+    const max = viewport.scrollWidth - viewport.clientWidth;
+    const p = max > 0 ? viewport.scrollLeft / max : 0;
+    if (bar) bar.style.setProperty('--p', String(p));
+    if (count) count.textContent = pad(Math.min(total, Math.round(p * (total - 1)) + 1)) + ' / ' + pad(total);
+  }, { passive: true });
+
+  mm.add('(min-width: 901px)', () => {
+    root.classList.add('is-pinned');
+
+    const tween = gsap.to(track, {
+      x: () => -distancia(),
+      ease: 'none',
+      scrollTrigger: {
+        trigger: root,
+        start: 'top top',
+        end: () => '+=' + distancia(),
+        pin: true,
+        scrub: 0.6,
+        anticipatePin: 1,
+        invalidateOnRefresh: true,
+        onUpdate: (self) => {
+          if (bar) bar.style.setProperty('--p', String(self.progress));
+          if (!count) return;
+          const atual = Math.min(total, Math.round(self.progress * (total - 1)) + 1);
+          count.textContent = pad(atual) + ' / ' + pad(total);
+        },
+      },
+    });
+
+    return () => {
+      tween.scrollTrigger.kill();
+      tween.kill();
+      gsap.set(track, { clearProps: 'transform' });
+      root.classList.remove('is-pinned');
+    };
+  });
+}
+
+/* -------------------------------------------------------------
+   OS 3 MEDOS — a seção prende e os cards sobem um sobre o outro
+
+   Só no desktop: a seção fica presa pelo tempo de trocar os cards
+   (uma tela de rolagem por troca). O card que chega sobe de baixo,
+   recortado pela borda da pilha, e o anterior recua e esmaece por
+   baixo dele. No celular e com movimento reduzido os cards ficam em
+   coluna, em fluxo normal — o CSS já cuida desse estado.
+   ------------------------------------------------------------- */
+function initFears() {
+  const root = document.querySelector('[data-fears]');
+  if (!root || prefersReducedMotion()) return;
+
+  const cards = [...root.querySelectorAll('[data-fear]')];
+  const bar = root.querySelector('[data-fears-progress]');
+  const count = root.querySelector('[data-fears-count]');
+  if (cards.length < 2) return;
+
+  const motor = getScroll();
+  if (!motor) return;
+
+  const { gsap } = motor;
+  const total = cards.length;
+  const pad = (n) => String(n).padStart(2, '0');
+  const mm = gsap.matchMedia();
+
+  mm.add('(min-width: 901px)', () => {
+    root.classList.add('is-pinned');
+    gsap.set(cards.slice(1), { yPercent: 104 });
+
+    const tl = gsap.timeline({
+      defaults: { ease: 'none', duration: 1 },
+      scrollTrigger: {
+        trigger: root,
+        start: 'top top',
+        end: () => '+=' + Math.round(window.innerHeight * (total - 1)),
+        pin: true,
+        scrub: 0.6,
+        anticipatePin: 1,
+        invalidateOnRefresh: true,
+        onUpdate: (self) => {
+          if (bar) bar.style.setProperty('--p', String(self.progress));
+          if (!count) return;
+          const atual = Math.min(total, Math.round(self.progress * (total - 1)) + 1);
+          count.textContent = pad(atual) + ' / ' + pad(total);
+        },
+      },
+    });
+
+    cards.slice(1).forEach((card, i) => {
+      tl.to(card, { yPercent: 0 }, i)
+        .to(cards[i], { scale: 0.92, opacity: 0.35 }, i);
+    });
+
+    return () => {
+      tl.scrollTrigger.kill();
+      tl.kill();
+      gsap.set(cards, { clearProps: 'transform,opacity' });
+      root.classList.remove('is-pinned');
+    };
+  });
+}
+
+/* -------------------------------------------------------------
    CONDIÇÕES — alternador Clínica / Cirúrgica
    Padrão de tabs da WAI-ARIA: setas navegam, Home/End vão às
    pontas, e o painel escondido usa [hidden] de verdade, para não
@@ -174,58 +351,6 @@ function initConditions() {
   };
   window.addEventListener('resize', reposition);
   if (document.fonts) document.fonts.ready.then(reposition);
-}
-
-/* -------------------------------------------------------------
-   ABCDE — autoexame guiado
-   Conta quantos critérios foram marcados e devolve UMA orientação,
-   em três níveis. Nunca um diagnóstico: o texto de cada nível fala
-   de conduta ("vale marcar", "procure"), nunca de doença.
-   ------------------------------------------------------------- */
-const ABCDE_LEVELS = [
-  {
-    max: 0,
-    level: 1,
-    title: 'Nenhum sinal de alerta marcado.',
-    text: 'Siga com o autoexame mensal e mantenha a avaliação dermatológica de rotina. Pintas mudam com o tempo — o que vale é comparar a mesma lesão ao longo dos meses.',
-  },
-  {
-    max: 2,
-    level: 2,
-    title: 'Vale marcar uma avaliação.',
-    text: 'Um ou dois critérios não significam doença, mas indicam uma lesão que merece ser olhada de perto. Na consulta, a dermatoscopia mostra estruturas que o olho desarmado não alcança.',
-  },
-  {
-    max: 5,
-    level: 3,
-    title: 'Procure avaliação com brevidade.',
-    text: 'Três ou mais critérios na mesma lesão pedem exame presencial sem esperar. No câncer de pele, o diagnóstico precoce é o que muda o desfecho.',
-  },
-];
-
-function initAbcde() {
-  const root = document.querySelector('[data-abcde]');
-  if (!root) return;
-
-  const inputs = [...root.querySelectorAll('input[type="checkbox"]')];
-  const result = root.querySelector('[data-abcde-result]');
-  const title = root.querySelector('[data-abcde-title]');
-  const text = root.querySelector('[data-abcde-text]');
-  const meter = [...root.querySelectorAll('[data-abcde-meter] i')];
-  if (!inputs.length || !result) return;
-
-  const update = () => {
-    const score = inputs.filter((i) => i.checked).length;
-    const match = ABCDE_LEVELS.find((l) => score <= l.max) || ABCDE_LEVELS[ABCDE_LEVELS.length - 1];
-
-    result.dataset.level = String(match.level);
-    if (title) title.textContent = match.title;
-    if (text) text.textContent = match.text;
-    meter.forEach((seg, i) => seg.classList.toggle('on', i < score));
-  };
-
-  inputs.forEach((input) => input.addEventListener('change', update));
-  update();
 }
 
 /* -------------------------------------------------------------
@@ -409,11 +534,131 @@ function initDock() {
   update();
 }
 
+/* -------------------------------------------------------------
+   HERO — o vídeo conduz a entrada
+
+   A cada chegada ao hero (na abertura, depois da cortina, e toda vez
+   que a pessoa volta ao topo) o vídeo toca UMA vez, do começo. Enquanto
+   a Dra. Isabela se move, o texto sobe de baixo para cima, letra por
+   letra na manchete; os tempos de cada bloco estão no CSS. Quando o
+   vídeo termina, entram por último a barra de navegação e os botões.
+   Ao sair do hero tudo volta ao estado inicial, pronto para repetir.
+
+   Se o navegador bloquear o autoplay (modo economia do iPhone, por
+   exemplo), a sequência termina assim mesmo: nada fica escondido.
+   ------------------------------------------------------------- */
+
+/** Atraso da primeira letra e intervalo entre letras da manchete (s). */
+const HERO_LETTER_START = 0.8;
+const HERO_LETTER_STEP = 0.09;
+/** Quando o vídeo não toca, o fim vem logo depois do último texto (ms). */
+const HERO_FALLBACK_END = 6800;
+
+function initHero() {
+  const hero = document.querySelector('[data-hero]');
+  if (!hero) return;
+
+  const video = hero.querySelector('[data-hero-video]');
+  const title = hero.querySelector('[data-hero-title]');
+  const nav = document.querySelector('[data-nav]');
+
+  // Movimento reduzido: tudo no estado final e o vídeo parado no
+  // primeiro quadro, que é o mesmo do poster.
+  if (prefersReducedMotion()) {
+    hero.classList.add('is-playing', 'is-finished');
+    if (video) video.pause();
+    return;
+  }
+
+  // Só a partir daqui o CSS esconde os blocos: sem JS o hero aparece
+  // inteiro, parado.
+  hero.classList.add('is-sequenced');
+  if (title) splitLetters(title, { start: HERO_LETTER_START, step: HERO_LETTER_STEP });
+
+  let rodando = false;
+  let fimTimer = 0;
+
+  const finalizar = () => {
+    clearTimeout(fimTimer);
+    hero.classList.add('is-finished');
+    if (nav) nav.classList.remove('nav--intro');
+  };
+
+  const iniciar = () => {
+    if (rodando) return;
+    rodando = true;
+
+    hero.classList.remove('is-finished');
+    hero.classList.add('is-playing');
+    if (nav) nav.classList.add('nav--intro');
+
+    if (!video) {
+      fimTimer = setTimeout(finalizar, HERO_FALLBACK_END);
+      return;
+    }
+
+    video.currentTime = 0;
+    // Trava de segurança: se o 'ended' não chegar, encerra pela duração.
+    const duracao = Number.isFinite(video.duration) ? video.duration * 1000 : 8000;
+    fimTimer = setTimeout(finalizar, duracao + 600);
+
+    const tocando = video.play();
+    if (tocando) {
+      tocando.catch(() => {
+        clearTimeout(fimTimer);
+        fimTimer = setTimeout(finalizar, HERO_FALLBACK_END);
+      });
+    }
+  };
+
+  const resetar = () => {
+    if (!rodando) return;
+    rodando = false;
+    clearTimeout(fimTimer);
+    hero.classList.remove('is-playing', 'is-finished');
+    if (nav) nav.classList.remove('nav--intro');
+    if (video) {
+      video.pause();
+      video.currentTime = 0;
+    }
+  };
+
+  if (video) video.addEventListener('ended', finalizar);
+
+  // Entra quando um quarto do hero está na tela (no celular o hero é
+  // mais alto que a tela, então um limiar maior nunca seria atingido)
+  // e reseta só quando ele sai por completo.
+  const observar = () => {
+    new IntersectionObserver(([entrada]) => {
+      if (entrada.isIntersecting && entrada.intersectionRatio >= 0.25) iniciar();
+      else if (!entrada.isIntersecting) resetar();
+    }, { threshold: [0, 0.25] }).observe(hero);
+  };
+
+  // A primeira sequência espera a cortina do preloader sair, que marca
+  // o <html> com .is-ready.
+  const raiz = document.documentElement;
+  if (raiz.classList.contains('is-ready')) {
+    observar();
+  } else {
+    new MutationObserver((_, mo) => {
+      if (!raiz.classList.contains('is-ready')) return;
+      mo.disconnect();
+      observar();
+    }).observe(raiz, { attributes: true, attributeFilter: ['class'] });
+  }
+}
+
 /** Contrato da skill de página: cada página exporta um init. */
 export function initHome() {
+  initHero();
+  // Pins criados na ordem em que aparecem na página: o ScrollTrigger
+  // calcula o espaço de cada pin somando os que vieram antes dele.
+  initStandUp();
+  initSymptoms();
   initJourney();
   initConditions();
-  initAbcde();
+  initFears();
   initVoices();
   initParallax();
   initDock();

@@ -13,8 +13,8 @@
   align-items: center;
   justify-content: space-between;
   gap: var(--gutter);
-  padding: 2.4rem var(--pad-x);
-  color: var(--c-text-on-dark);
+  padding: 1.4rem var(--pad-x);
+  color: var(--c-hero-ink);
   transition: padding .5s var(--ease), color .4s var(--ease);
   mix-blend-mode: normal;
 }
@@ -22,16 +22,37 @@
 /* Esconde a barra ao descer, devolve ao subir — libera altura de
    tela na leitura sem tirar o acesso ao CTA. */
 .nav--hidden { transform: translateY(-110%); }
+
+/* Entrada do hero: a barra fica fora de cena enquanto o vídeo roda e
+   desce no fim (home.js › initHero). Quem navega por teclado não
+   fica sem menu: o foco dentro da barra a traz de volta. */
+.nav--intro { transform: translateY(-110%); }
+.nav--intro:focus-within { transform: none; }
 .nav { transition: transform .55s var(--ease), padding .5s var(--ease), color .4s var(--ease); }
 
 .nav--stuck { padding-block: 1.4rem; color: var(--c-text-on-light); }
+
+/* Filete do cabeçalho do design system: marca o fim da barra sobre o
+   marfim do hero e some quando a cápsula entra. */
+.nav::after {
+  content: "";
+  position: absolute;
+  left: var(--pad-x);
+  right: var(--pad-x);
+  bottom: 0;
+  height: 1px;
+  background: rgba(21, 58, 50, .15);
+  transition: opacity .4s var(--ease);
+  pointer-events: none;
+}
+.nav--stuck::after { opacity: 0; }
 
 .nav__plate {
   position: absolute;
   inset: 1rem var(--pad-x);
   border-radius: 70rem;
   background: var(--c-paper);
-  box-shadow: 0 1.2rem 4rem -1.6rem rgba(6, 35, 42, .35);
+  box-shadow: 0 1.2rem 4rem -1.6rem rgba(21, 58, 50, .35);
   opacity: 0;
   transform: scaleY(.6);
   transform-origin: 50% 0;
@@ -51,7 +72,7 @@
   gap: 1.2rem;
   padding-inline: 1.2rem;
 }
-.nav__brand img { width: 3.8rem; height: auto; }
+.nav__brand img { width: 4rem; height: auto; }
 .nav__brand-text {
   display: flex;
   flex-direction: column;
@@ -59,15 +80,16 @@
 }
 .nav__brand-name {
   font-family: var(--f-display);
-  font-size: 1.7rem;
-  font-weight: 600;
-  letter-spacing: -0.03em;
+  font-size: 2.4rem;
+  font-weight: 400;
+  letter-spacing: -0.045em;
 }
 .nav__brand-role {
-  font-size: 1.05rem;
-  letter-spacing: 0.16em;
+  margin-top: .3rem;
+  font-size: 1rem;
+  letter-spacing: 0.25em;
   text-transform: uppercase;
-  color: var(--c-brand);
+  color: var(--c-hero-ink);
   font-weight: 500;
 }
 .nav--stuck .nav__brand-role { color: var(--c-brand-deep); }
@@ -75,9 +97,9 @@
 .nav__menu {
   display: flex;
   align-items: center;
-  gap: clamp(1.6rem, 2.4vw, 3.6rem);
-  font-size: var(--t-sm);
-  font-weight: 500;
+  gap: clamp(2rem, 2.7vw, 4.8rem);
+  font-size: 1.3rem;
+  font-weight: 400;
 }
 
 .nav__link {
@@ -97,7 +119,7 @@
   position: absolute;
   left: 0; top: 0;
   padding: .6rem 0;
-  color: var(--c-brand);
+  color: var(--c-accent-deep);
   transform: translateY(100%);
   transition: transform .45s var(--ease-out);
 }
@@ -109,25 +131,15 @@
 .nav__link:focus-visible span { transform: translateY(-100%); }
 .nav__link:focus-visible::after { transform: translateY(0); }
 
-.nav__ctas { display: flex; align-items: center; gap: 1.2rem; }
-
-.nav__phone {
-  display: inline-flex;
-  align-items: center;
-  gap: .8rem;
-  font-size: var(--t-sm);
-  font-weight: 500;
-  font-variant-numeric: tabular-nums;
-}
-.nav__phone svg { width: 1.6rem; height: 1.6rem; }
+.nav__ctas { display: flex; align-items: center; gap: 2rem; }
 
 /* ---- Botão hambúrguer (mobile) ---- */
 .nav__burger {
   display: none;
   width: 5rem; height: 5rem;
   border-radius: 50%;
-  background: var(--c-accent);
-  color: var(--c-ink);
+  background: var(--c-hero-ink);
+  color: var(--c-paper);
   place-items: center;
 }
 .nav__burger-lines {
@@ -170,21 +182,21 @@
    o botão está sempre no mesmo lugar, então o gesto é um só. */
 .menu__close {
   position: absolute;
-  top: 2.4rem;
+  top: 1.4rem;
   right: var(--pad-x);
   display: grid;
   place-items: center;
   width: 5rem;
   height: 5rem;
   border-radius: 50%;
-  background: var(--c-accent);
+  background: var(--c-paper);
   color: var(--c-ink);
   transition: transform var(--dur-fast) var(--ease-out),
               background-color var(--dur-fast) var(--ease);
 }
 .menu__close svg { width: 2rem; height: 2rem; }
 @media (hover: hover) and (pointer: fine) {
-  .menu__close:hover { transform: rotate(90deg); background: var(--c-white); }
+  .menu__close:hover { transform: rotate(90deg); background: var(--c-accent); }
 }
 .menu__close:active { transform: scale(.94); }
 
@@ -205,7 +217,7 @@
   font-size: clamp(3.6rem, 9vw, 7.2rem);
   font-weight: 500;
   line-height: 1.02;
-  letter-spacing: -0.04em;
+  letter-spacing: -0.018em;
   transform: translateY(110%);
   transition: transform .7s var(--ease-out), color .3s var(--ease);
 }
@@ -233,10 +245,8 @@
 
 @media (max-width: 1100px) {
   .nav__menu { display: none; }
-  .nav__phone { display: none; }
   .nav__burger { display: grid; }
 }
 @media (max-width: 560px) {
-  .nav__ctas .btn--nav { display: none; }
   .nav__brand-text { display: none; }
 }

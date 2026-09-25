@@ -24,7 +24,9 @@
   line-height: .88;
   margin-bottom: clamp(3rem, 4vw, 5rem);
 }
-.footer__cta-title .em { color: var(--c-accent); }
+/* O circunflexo da itálica avança sobre o "?" que vem logo depois;
+   o respiro devolve o espaço que a inclinação come. */
+.footer__cta-title .em { color: var(--c-accent); margin-right: .08em; }
 
 .footer__cta-actions {
   display: flex;
@@ -33,7 +35,7 @@
   gap: 1.6rem;
 }
 
-/* Halo turquesa atrás do CTA — dá profundidade ao bloco escuro
+/* Halo sálvia atrás do CTA — dá profundidade ao bloco escuro
    sem introduzir um gradiente arbitrário no fundo inteiro. */
 .footer__glow {
   position: absolute;
@@ -42,7 +44,7 @@
   width: min(120rem, 130vw);
   aspect-ratio: 1;
   translate: -50% -50%;
-  background: radial-gradient(circle, rgba(53, 179, 193, .22), transparent 62%);
+  background: radial-gradient(circle, rgba(143, 194, 171, .22), transparent 62%);
   pointer-events: none;
 }
 
@@ -105,7 +107,7 @@
   padding-bottom: 3rem;
   font-size: 1.25rem;
   line-height: 1.6;
-  color: #6b8c92;
+  color: #93b5a4;
 }
 
 /* ---- Barra flutuante de contato (mobile) ---- */
@@ -116,8 +118,8 @@
   display: none;
   gap: 1rem;
   padding: 1rem;
-  border-radius: 70rem;
-  background: rgba(6, 35, 42, .82);
+  border-radius: .2rem;
+  background: rgba(21, 58, 50, .82);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
   box-shadow: 0 1.6rem 4rem -1rem rgba(0, 0, 0, .5);
@@ -125,7 +127,10 @@
   transition: transform .6s var(--ease-out);
 }
 .dock[data-show="true"] { transform: translateY(0); }
+.dock { color: var(--c-text-on-dark); }
 .dock .btn { flex: 1; }
+/* No fundo escuro da barra o contorno claro precisa de wipe claro. */
+.dock .btn--ghost { --btn-wipe: var(--c-paper); --btn-fg-hover: var(--c-hero-ink); }
 .dock .btn__inner { justify-items: center; padding: 1.4rem 1rem; }
 
 @media (max-width: 760px) { .dock { display: flex; } }

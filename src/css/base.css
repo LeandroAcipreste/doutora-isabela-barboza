@@ -2,6 +2,15 @@
    BASE — raiz fluida + tipografia global
    ============================================================= */
 
+/* ---- Fontes locais (assets/fonts) -----------------------------
+   P052 nos títulos e Nimbus Sans no texto, as mesmas do design
+   system. Caminho relativo a ESTE arquivo: src/css/ sobe dois
+   níveis até a raiz. */
+@font-face { font-family: 'P052'; src: url('../../assets/fonts/P052-Roman.otf') format('opentype'); font-style: normal; font-weight: 400; font-display: swap; }
+@font-face { font-family: 'P052'; src: url('../../assets/fonts/P052-Italic.otf') format('opentype'); font-style: italic; font-weight: 400; font-display: swap; }
+@font-face { font-family: 'Nimbus Sans'; src: url('../../assets/fonts/NimbusSans-Regular.otf') format('opentype'); font-weight: 400; font-display: swap; }
+@font-face { font-family: 'Nimbus Sans'; src: url('../../assets/fonts/NimbusSans-Bold.otf') format('opentype'); font-weight: 700; font-display: swap; }
+
 /* A raiz é proporcional à viewport: 1rem ≈ 10px em 1440px.
    Isso faz TODO o layout (tipo, espaço, raio, borda) escalar em
    conjunto, sem breakpoint pulando degrau. O clamp existe para
@@ -11,6 +20,9 @@ html {
   font-size: clamp(9.2px, 0.6944vw, 12.4px);
   scroll-behavior: smooth;
   overscroll-behavior-y: none;
+  /* A P052 só tem peso regular: sem isto, todo peso 600 da serifa
+     viraria um negrito falso desenhado pelo navegador. */
+  font-synthesis: style;
   background: var(--c-ink);
 }
 
@@ -36,28 +48,26 @@ body {
 body.is-locked { overflow: hidden; height: 100vh; }
 
 /* ---- Títulos ------------------------------------------------
-   Fraunces variável: em corpo grande queremos opsz alto, peso
-   editorial e um leve "wonk" (a serifa torta da fonte) — é o que
-   dá personalidade sem virar caligrafia. */
+   P052: serifa humanista de desenho clássico, com itálica caligráfica
+   para as palavras de destaque — o registro editorial do design
+   system. Peso único (400) nos títulos. */
 h1, h2, h3, h4, .display {
   font-family: var(--f-display);
-  font-weight: 500;
-  line-height: 0.92;
-  letter-spacing: -0.035em;
-  font-variation-settings: 'SOFT' 22, 'WONK' 1, 'opsz' 120;
+  font-weight: 400;
+  line-height: 0.96;
+  letter-spacing: -0.025em;
   text-wrap: balance;
 }
 
 h1 { font-size: var(--t-h1); }
 h2 { font-size: var(--t-h2); }
-h3 { font-size: var(--t-h3); line-height: 1.02; letter-spacing: -0.028em; }
-h4 { font-size: var(--t-h4); line-height: 1.1;  letter-spacing: -0.022em; font-weight: 600; }
+h3 { font-size: var(--t-h3); line-height: 1.04; letter-spacing: -0.012em; }
+h4 { font-size: var(--t-h4); line-height: 1.12; letter-spacing: -0.008em; font-weight: 600; }
 
 p { text-wrap: pretty; }
 
 em, .em {
   font-style: italic;
-  font-variation-settings: 'SOFT' 40, 'WONK' 1, 'opsz' 120;
 }
 
 strong, b { font-weight: 600; }
@@ -79,7 +89,7 @@ strong, b { font-weight: 600; }
 }
 
 .mono-num {
-  font-variant-numeric: tabular-nums;
+  font-variant-numeric: lining-nums tabular-nums;
   font-feature-settings: 'tnum' 1;
 }
 
@@ -138,4 +148,4 @@ strong, b { font-weight: 600; }
   color: var(--c-text-on-dark);
 }
 .on-dark ::selection { background: var(--c-accent); color: var(--c-ink); }
-::selection { background: var(--c-brand); color: var(--c-white); }
+::selection { background: var(--c-hero); color: var(--c-hero-ink); }

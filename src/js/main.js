@@ -66,6 +66,14 @@ function boot() {
   const initPage = PAGES[page];
   if (initPage) initPage();
 
+  // Os gatilhos são medidos na ordem em que foram criados, e os
+  // componentes globais (marquee) nascem antes dos pins da página.
+  // Um pin acima deles acrescenta altura de rolagem que eles ainda
+  // não conheciam — a faixa ficava parada, com o trajeto calculado
+  // no lugar errado. Reordenar pela posição na página resolve para
+  // qualquer pin, atual ou futuro.
+  motor?.ScrollTrigger.sort();
+
   // A cortina só sai depois que a página está montada; o reveal é
   // ligado no mesmo instante, então a primeira dobra anima na
   // frente do usuário em vez de já ter animado escondida.
