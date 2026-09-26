@@ -56,6 +56,10 @@
 
 .hero__title {
   max-width: 80rem;
+  /* Quebra só pela largura real: o "balance" herdado dos títulos é
+     aplicado de forma instável pelo Safari quando as palavras são
+     caixas inline (divisão em letras). */
+  text-wrap: wrap;
   font-size: clamp(5.4rem, 5.6vw, 9.4rem);
   line-height: 1.055;
   letter-spacing: -0.055em;
@@ -231,6 +235,9 @@
    dentro da palavra deixa de existir em qualquer navegador. O nowrap na
    máscara é a segunda garantia; entre palavras a quebra segue normal,
    porque o espaço fica fora dessas caixas. */
+/* Até ser dividida em letras (depois das fontes, home.js › initHero),
+   a manchete fica invisível: não pisca inteira antes da entrada. */
+.hero.is-sequenced .hero__title:not([data-letters-done="true"]) { visibility: hidden; }
 .hero__title .w { white-space: nowrap; }
 .hero__title .w__in {
   display: inline-flex;

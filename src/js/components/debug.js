@@ -224,6 +224,29 @@ function vigiarLetras() {
       a0 ? `anim0 ${a0.playState} t=${Math.round(a0.currentTime)}ms` : 'anim0 —',
       `parágrafo opac=${lead ? (+getComputedStyle(lead).opacity).toFixed(2) : '—'}`,
     ]);
+    if (n === 24) {
+      // Uma vez por entrada: linhas da manchete e, por palavra, a largura
+      // da caixa x a soma das letras. Caixa maior que as letras = medida
+      // feita com outra fonte (o defeito de quebra de linha do Safari).
+      const palavras = [...document.querySelectorAll('.hero__title .w')];
+      const topos = new Set(palavras.map((w) => Math.round(w.getBoundingClientRect().top)));
+      const titulo = document.querySelector('.hero__title');
+      escrever('manchete', [
+        'linhas=' + topos.size,
+        'largura título=' + Math.round(titulo.getBoundingClientRect().width),
+        'fonte=' + getComputedStyle(titulo).fontFamily,
+      ]);
+      palavras.forEach((w) => {
+        const caixa = w.getBoundingClientRect().width;
+        const letrasW = [...w.querySelectorAll('.ch')].reduce((t, c) => t + c.getBoundingClientRect().width, 0);
+        escrever('manchete', [
+          '"' + w.textContent + '"',
+          'caixa=' + caixa.toFixed(1),
+          'letras=' + letrasW.toFixed(1),
+          'sobra=' + (caixa - letrasW).toFixed(1),
+        ]);
+      });
+    }
     if (n > 0) timer = setTimeout(() => amostrar(n - 1), 400);
   };
 

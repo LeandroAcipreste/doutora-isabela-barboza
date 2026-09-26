@@ -25,8 +25,13 @@ export function initPreloader(onDone = () => {}) {
 
   document.body.classList.add('is-locked');
 
+  // As fontes contam como mais um item: a manchete do hero é dividida
+  // em letras e medida com a fonte certa. Se a P052 chega depois, o
+  // Safari do iPhone mantém as larguras medidas com a fonte de reserva
+  // (mais larga) e a manchete quebra linha errado.
+  const temFontes = !!document.fonts;
   let loaded = 0;
-  const total = images.length || 1;
+  const total = images.length + (temFontes ? 1 : 0) || 1;
 
   const paint = () => {
     const pct = Math.round((loaded / total) * 100);
@@ -64,8 +69,16 @@ export function initPreloader(onDone = () => {}) {
 
   paint();
 
+  if (temFontes) {
+    Promise.all([
+      document.fonts.load('400 1em P052'),
+      document.fonts.load('italic 400 1em P052'),
+      document.fonts.load('400 1em "Nimbus Sans"'),
+    ]).then(bump, bump);
+  }
+
   if (!images.length) {
-    finish();
+    if (!temFontes) finish();
   } else {
     images.forEach((media) => {
       // Vídeo conta como pronto quando os metadados chegam (readyState

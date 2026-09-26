@@ -723,9 +723,36 @@ function initHero() {
 
   // Só a partir daqui o CSS esconde os blocos (estado inicial).
   hero.classList.add('is-sequenced');
-  if (title) splitLetters(title);
 
-  const letras = title ? [...title.querySelectorAll('.ch')] : [];
+  // A manchete só é dividida em letras com a fonte P052 já carregada. O
+  // Safari do iPhone mede as caixas das palavras no momento da divisão e
+  // NÃO as remede quando a fonte troca: dividida com a fonte de reserva
+  // (mais larga), a manchete quebrava linha errado. Limite de 3 s para a
+  // manchete nunca ficar presa se uma fonte falhar.
+  let letras = [];
+  const fontes = document.fonts
+    ? Promise.race([
+      Promise.all([document.fonts.load('400 1em P052'), document.fonts.load('italic 400 1em P052')]),
+      new Promise((ok) => setTimeout(ok, 3000)),
+    ]).catch(() => {})
+    : Promise.resolve();
+  const pronto = fontes.then(() => {
+    if (!title) return;
+    splitLetters(title);
+    letras = [...title.querySelectorAll('.ch')];
+    dlog('[hero] manchete dividida; P052 carregada =', document.fonts ? document.fonts.check('16px P052') : '?');
+  });
+
+  // Proteção extra: se uma fonte ainda chegar depois, a manchete inteira
+  // é remedida (esconder e mostrar obriga o navegador a refazer o layout).
+  if (document.fonts && title) {
+    document.fonts.addEventListener('loadingdone', () => {
+      title.style.display = 'none';
+      void title.offsetHeight;
+      title.style.display = '';
+    });
+  }
+
   const blocos = Object.entries(HERO_STEPS)
     .map(([passo, quando]) => [hero.querySelector('[data-hero-step="' + passo + '"]'), quando])
     .filter(([bloco]) => bloco);
@@ -737,8 +764,20 @@ function initHero() {
     animacoes = [];
   };
 
+  // Obriga o navegador a refazer a medida da manchete inteira. É o que
+  // acontecia sozinho quando a pessoa saía do hero e voltava (e por isso
+  // a volta ficava certa e a primeira carga não): feito antes de toda
+  // entrada, a primeira carga fica idêntica à volta.
+  const remedirManchete = () => {
+    if (!title) return;
+    title.style.display = 'none';
+    void title.offsetHeight;
+    title.style.display = '';
+  };
+
   const tocarEntrada = () => {
     pararEntrada();
+    remedirManchete();
     letras.forEach((letra, i) => {
       animacoes.push(letra.animate(
         [{ transform: 'translateY(115%)' }, { transform: 'translateY(0)' }],
@@ -772,8 +811,11 @@ function initHero() {
     hero.classList.remove('is-finished');
     hero.classList.add('is-playing');
     if (nav) nav.classList.add('nav--intro');
-    tocarEntrada();
-    dlog('[hero] entrada iniciada:', animacoes.length + ' animações', video ? 'vídeo readyState=' + video.readyState : 'sem vídeo');
+    pronto.then(() => {
+      if (!rodando) return;
+      tocarEntrada();
+      dlog('[hero] entrada iniciada:', animacoes.length + ' animações', video ? 'vídeo readyState=' + video.readyState : 'sem vídeo');
+    });
 
     if (!video) {
       fimTimer = setTimeout(() => finalizar('relógio (sem vídeo)'), HERO_FALLBACK_END);
