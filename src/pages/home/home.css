@@ -221,9 +221,24 @@
 }
 
 /* Manchete: a máscara continua sendo a palavra (.w), mas quem sobe é
-   cada letra. A palavra em si fica parada. */
-.hero__title .w__in { transform: none; transition: none; }
-.hero__title .ch { display: inline-block; }
+   cada letra. A palavra em si fica parada.
+
+   Cada letra é inline-block (precisa de transform próprio), e o WebKit
+   usa a fronteira entre inline-blocks vizinhos como ponto de quebra de
+   linha, mesmo sem espaço entre eles. No iPhone isso partia as palavras
+   no meio ("S / ua", "p / recisão"). A palavra vira um inline-flex: um
+   contêiner flex nunca quebra linha entre os itens, então a quebra
+   dentro da palavra deixa de existir em qualquer navegador. O nowrap na
+   máscara é a segunda garantia; entre palavras a quebra segue normal,
+   porque o espaço fica fora dessas caixas. */
+.hero__title .w { white-space: nowrap; }
+.hero__title .w__in {
+  display: inline-flex;
+  flex-wrap: nowrap;
+  transform: none;
+  transition: none;
+}
+.hero__title .ch { display: inline-block; flex: none; }
 .hero.is-sequenced .hero__title .ch { transform: translateY(115%); }
 
 /* Safari: numa caixa com overflow:hidden e border-radius, filho que o
