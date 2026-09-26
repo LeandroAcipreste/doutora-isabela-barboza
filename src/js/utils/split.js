@@ -87,18 +87,17 @@ function colarPontuacao(el) {
 }
 
 /**
- * Fatia por palavra (máscaras) e, dentro de cada palavra, por letra.
- * Cada letra recebe o próprio atraso em --d, então quem anima decide
- * no CSS quando usar o atraso — só na entrada, e não na saída.
+ * Fatia por palavra (máscaras) e, dentro de cada palavra, por letra
+ * (.ch). Quem anima as letras é quem chama — no hero, uma linha do
+ * tempo do GSAP.
  * O texto inteiro vira aria-label: leitor de tela lê a frase, não
  * letra por letra.
  */
-export function splitLetters(el, { start = 0, step = 0.08 } = {}) {
+export function splitLetters(el) {
   if (el.dataset.lettersDone === 'true') return;
   el.setAttribute('aria-label', el.textContent.replace(/\s+/g, ' ').trim());
   splitWords(el);
 
-  let i = 0;
   el.querySelectorAll('.w__in').forEach((inner) => {
     inner.setAttribute('aria-hidden', 'true');
     const walker = document.createTreeWalker(inner, NodeFilter.SHOW_TEXT);
@@ -111,8 +110,6 @@ export function splitLetters(el, { start = 0, step = 0.08 } = {}) {
         const span = document.createElement('span');
         span.className = 'ch';
         span.textContent = letra;
-        span.style.setProperty('--d', (start + i * step).toFixed(2) + 's');
-        i += 1;
         frag.append(span);
       }
       node.replaceWith(frag);

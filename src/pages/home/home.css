@@ -210,45 +210,21 @@
 .hero__rule span:last-child { font-size: 1.9rem; line-height: 1; }
 
 /* ---- Coreografia de entrada (home.js › initHero) ----
-   O vídeo tem 8 s. Enquanto ele roda, o texto sobe de baixo para cima
-   na ordem de leitura: linha de apoio, manchete letra por letra (os
-   atrasos de cada letra vêm do JS em --d), parágrafo, áreas, legenda
-   e filete. A barra de navegação só entra no fim do vídeo
-   (.is-finished, no header.css). Os atrasos existem apenas na ENTRADA: ao sair do
-   hero tudo volta rápido e sem espera, pronto para repetir.
-   .is-sequenced é posta pelo JS — sem ele, nada fica escondido. */
+   Toda a entrada é uma linha do tempo do GSAP, não transição CSS:
+   atraso guardado em variável dentro de "transition" falha em versões
+   do Safari (as letras subiam juntas ou fora de ordem). Aqui fica só o
+   ESTADO INICIAL, que o GSAP anima e desfaz. .is-sequenced é posta
+   pelo JS — sem JS, nada fica escondido. */
 .hero.is-sequenced [data-hero-step] {
   opacity: 0;
   transform: translateY(2.4rem);
-  transition: opacity .3s var(--ease), transform .3s var(--ease-out);
 }
-.hero.is-playing [data-hero-step] {
-  opacity: 1;
-  transform: none;
-  /* Longhands de propósito: o atalho "transition" zeraria o atraso de
-     cada bloco, que vem das regras abaixo (menos específicas). */
-  transition-property: opacity, transform;
-  transition-duration: 1s, 1.2s;
-  transition-timing-function: var(--ease), var(--ease-out);
-}
-.hero.is-playing [data-hero-step="1"] { transition-delay: .3s; }
-.hero.is-playing [data-hero-step="3"] { transition-delay: 4.4s; }
-.hero.is-playing [data-hero-step="4"] { transition-delay: 5.2s; }
-.hero.is-playing [data-hero-step="5"] { transition-delay: 5.8s; }
-.hero.is-playing [data-hero-step="6"] { transition-delay: 6.3s; }
 
-/* Manchete: a máscara continua sendo a palavra (.w), mas quem sobe
-   é cada letra. A palavra em si fica parada. */
+/* Manchete: a máscara continua sendo a palavra (.w), mas quem sobe é
+   cada letra. A palavra em si fica parada. */
 .hero__title .w__in { transform: none; transition: none; }
-.hero__title .ch {
-  display: inline-block;
-  transform: translateY(115%);
-  transition: transform .3s var(--ease-out);
-}
-.hero.is-playing .hero__title .ch {
-  transform: none;
-  transition: transform 1s var(--ease-out) var(--d, 0s);
-}
+.hero__title .ch { display: inline-block; }
+.hero.is-sequenced .hero__title .ch { transform: translateY(115%); }
 
 /* Safari: numa caixa com overflow:hidden e border-radius, filho que o
    navegador compõe em camada própria (vídeo, imagem com transform ou em

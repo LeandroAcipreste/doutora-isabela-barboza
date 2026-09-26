@@ -12,6 +12,9 @@
  * entrada rodar atrás da cortina e ser desperdiçada.
  */
 
+// Primeiro import de propósito: com ?debug=1 ele intercepta o console
+// antes de qualquer outro módulo rodar (ver components/debug.js).
+import { initDebug } from './components/debug.js';
 import { measureViewport, applyViewport } from './utils/viewport.js';
 import { initFit } from './components/fit.js';
 import { initNav } from './components/nav.js';
@@ -53,6 +56,9 @@ function resetScroll() {
 }
 
 function boot() {
+  // Console na página (só com ?debug=1 no endereço).
+  initDebug();
+
   // Primeira coisa do site: medir a tela real. Tudo o que vem depois
   // (raiz rem, pins, encaixes) já nasce na escala certa do aparelho.
   applyViewport(measureViewport());

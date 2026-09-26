@@ -9,6 +9,7 @@
 import { clamp, prefersReducedMotion } from '../../js/utils/motion.js';
 import { getScroll } from '../../js/libs/gsap-setup.js';
 import { splitLetters } from '../../js/utils/split.js';
+import { dlog } from '../../js/components/debug.js';
 
 /* -------------------------------------------------------------
    JORNADA — a seção prende e os cards passam um a um
@@ -687,8 +688,12 @@ function initParallax() {
 /** Atraso da primeira letra e intervalo entre letras da manchete (s). */
 const HERO_LETTER_START = 0.8;
 const HERO_LETTER_STEP = 0.09;
+/** Momento (s) em que cada bloco sobe, contado do início do vídeo. */
+const HERO_STEPS = { 1: 0.3, 3: 4.4, 4: 5.2, 5: 5.8, 6: 6.3 };
 /** Quando o vídeo não toca, o fim vem logo depois do último texto (ms). */
 const HERO_FALLBACK_END = 6800;
+/** Mesma curva de saída do site (--ease-out em variables.css). */
+const HERO_EASE = 'cubic-bezier(0.16, 1, 0.3, 1)';
 
 function initHero() {
   const hero = document.querySelector('[data-hero]');
@@ -706,16 +711,56 @@ function initHero() {
     return;
   }
 
-  // Só a partir daqui o CSS esconde os blocos: sem JS o hero aparece
-  // inteiro, parado.
+  // A entrada usa a Web Animations API: o navegador roda o movimento no
+  // compositor, fora do JavaScript. Um engasgo da página (a saída do
+  // preloader, o vídeo decodificando) não trava nem faz pular as letras
+  // — o problema do Safari com transição CSS e com animação por quadro.
+  // Navegador sem a API: o hero fica inteiro e parado.
+  if (!('animate' in Element.prototype)) {
+    dlog('[hero] sem Web Animations API: hero estático');
+    return;
+  }
+
+  // Só a partir daqui o CSS esconde os blocos (estado inicial).
   hero.classList.add('is-sequenced');
-  if (title) splitLetters(title, { start: HERO_LETTER_START, step: HERO_LETTER_STEP });
+  if (title) splitLetters(title);
+
+  const letras = title ? [...title.querySelectorAll('.ch')] : [];
+  const blocos = Object.entries(HERO_STEPS)
+    .map(([passo, quando]) => [hero.querySelector('[data-hero-step="' + passo + '"]'), quando])
+    .filter(([bloco]) => bloco);
+
+  let animacoes = [];
+
+  const pararEntrada = () => {
+    animacoes.forEach((a) => a.cancel());   // volta ao estado inicial do CSS
+    animacoes = [];
+  };
+
+  const tocarEntrada = () => {
+    pararEntrada();
+    letras.forEach((letra, i) => {
+      animacoes.push(letra.animate(
+        [{ transform: 'translateY(115%)' }, { transform: 'translateY(0)' }],
+        { duration: 1000, delay: (HERO_LETTER_START + i * HERO_LETTER_STEP) * 1000, easing: HERO_EASE, fill: 'both' },
+      ));
+    });
+    blocos.forEach(([bloco, quando]) => {
+      animacoes.push(bloco.animate(
+        [{ opacity: 0, transform: 'translateY(2.4rem)' }, { opacity: 1, transform: 'translateY(0)' }],
+        { duration: 1200, delay: quando * 1000, easing: HERO_EASE, fill: 'both' },
+      ));
+    });
+  };
 
   let rodando = false;
   let fimTimer = 0;
 
-  const finalizar = () => {
+  const finalizar = (motivo) => {
+    dlog('[hero] fim da sequência:', typeof motivo === 'string' ? motivo : 'vídeo terminou');
     clearTimeout(fimTimer);
+    // O vídeo acabou: garante o texto inteiro no lugar.
+    animacoes.forEach((a) => a.finish());
     hero.classList.add('is-finished');
     if (nav) nav.classList.remove('nav--intro');
   };
@@ -727,32 +772,40 @@ function initHero() {
     hero.classList.remove('is-finished');
     hero.classList.add('is-playing');
     if (nav) nav.classList.add('nav--intro');
+    tocarEntrada();
+    dlog('[hero] entrada iniciada:', animacoes.length + ' animações', video ? 'vídeo readyState=' + video.readyState : 'sem vídeo');
 
     if (!video) {
-      fimTimer = setTimeout(finalizar, HERO_FALLBACK_END);
+      fimTimer = setTimeout(() => finalizar('relógio (sem vídeo)'), HERO_FALLBACK_END);
       return;
     }
 
     video.currentTime = 0;
     // Trava de segurança: se o 'ended' não chegar, encerra pela duração.
     const duracao = Number.isFinite(video.duration) ? video.duration * 1000 : 8000;
-    fimTimer = setTimeout(finalizar, duracao + 600);
+    fimTimer = setTimeout(() => finalizar('limite de tempo (ended não chegou)'), duracao + 600);
 
     const tocando = video.play();
     if (tocando) {
-      tocando.catch(() => {
+      tocando.then(() => dlog('[hero] vídeo tocando')).catch((erro) => {
+        dlog('[hero] vídeo BLOQUEADO:', erro && erro.name, erro && erro.message);
+        // Vídeo bloqueado (modo economia do iPhone, por exemplo): o texto
+        // já corre sozinho; só o fim passa a ser pelo relógio.
         clearTimeout(fimTimer);
-        fimTimer = setTimeout(finalizar, HERO_FALLBACK_END);
+        fimTimer = setTimeout(() => finalizar('relógio (vídeo bloqueado)'), HERO_FALLBACK_END);
       });
     }
   };
 
   const resetar = () => {
     if (!rodando) return;
+    dlog('[hero] saiu do hero: reiniciado');
     rodando = false;
     clearTimeout(fimTimer);
     hero.classList.remove('is-playing', 'is-finished');
     if (nav) nav.classList.remove('nav--intro');
+    // Volta ao estado inicial, pronto para a próxima chegada ao hero.
+    pararEntrada();
     if (video) {
       video.pause();
       video.currentTime = 0;

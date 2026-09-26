@@ -10,6 +10,8 @@
 
 const MAX_WAIT = 6000;
 
+import { dlog } from './debug.js';
+
 export function initPreloader(onDone = () => {}) {
   const loader = document.querySelector('[data-loader]');
   if (!loader) {
@@ -33,9 +35,10 @@ export function initPreloader(onDone = () => {}) {
   };
 
   let finished = false;
-  const finish = () => {
+  const finish = (motivo) => {
     if (finished) return;
     finished = true;
+    dlog('[preloader] cortina saindo:', motivo || 'mídia carregada', loaded + '/' + total);
     loaded = total;
     paint();
 
@@ -65,17 +68,19 @@ export function initPreloader(onDone = () => {}) {
     finish();
   } else {
     images.forEach((media) => {
-      // Vídeo conta como pronto quando já tem o primeiro quadro
-      // (readyState 2), não quando termina de baixar.
+      // Vídeo conta como pronto quando os metadados chegam (readyState
+      // 1). O Safari do iPhone costuma NÃO baixar dados de vídeo antes do
+      // play, então esperar o primeiro quadro prendia a cortina até o
+      // limite de 6 s. O poster já está na tela enquanto isso.
       const isVideo = media.tagName === 'VIDEO';
-      const ready = isVideo ? media.readyState >= 2 : media.complete && media.naturalWidth;
+      const ready = isVideo ? media.readyState >= 1 : media.complete && media.naturalWidth;
       if (ready) bump();
       else {
-        media.addEventListener(isVideo ? 'loadeddata' : 'load', bump, { once: true });
+        media.addEventListener(isVideo ? 'loadedmetadata' : 'load', bump, { once: true });
         media.addEventListener('error', bump, { once: true });
       }
     });
   }
 
-  setTimeout(finish, MAX_WAIT);
+  setTimeout(() => finish('limite de ' + MAX_WAIT / 1000 + ' s'), MAX_WAIT);
 }
