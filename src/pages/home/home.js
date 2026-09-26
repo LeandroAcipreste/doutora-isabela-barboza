@@ -162,6 +162,40 @@ function initStandUp() {
 }
 
 /* -------------------------------------------------------------
+   FOTOS QUE CRESCEM NO MEIO DA TELA — cirurgia robótica
+   Cada foto entra em miniatura, chega ao tamanho máximo quando o
+   centro dela cruza o meio da tela e volta à miniatura ao sair.
+   Amarrado à rolagem nos dois sentidos.
+   ------------------------------------------------------------- */
+const ZOOM_MIN = 0.86;
+const ZOOM_MAX = 1.08;
+
+function initZoom() {
+  const fotos = [...document.querySelectorAll('[data-zoom]')];
+  if (!fotos.length || prefersReducedMotion()) return;
+
+  const motor = getScroll();
+  if (!motor) return;
+
+  const { gsap } = motor;
+
+  fotos.forEach((foto) => {
+    gsap.set(foto, { scale: ZOOM_MIN });
+    gsap.timeline({
+      scrollTrigger: {
+        trigger: foto,
+        start: 'top bottom',
+        end: 'bottom top',
+        scrub: 0.5,
+        invalidateOnRefresh: true,
+      },
+    })
+      .to(foto, { scale: ZOOM_MAX, ease: 'power1.out', duration: 1 })
+      .to(foto, { scale: ZOOM_MIN, ease: 'power1.in', duration: 1 });
+  });
+}
+
+/* -------------------------------------------------------------
    SINTOMAS — a seção prende e os cards passam na horizontal
 
    A rolagem vertical vira deslocamento horizontal da fila: o pin
@@ -190,9 +224,8 @@ function initSymptoms() {
 
   const mm = gsap.matchMedia();
 
-  // No celular a seção não prende: o texto dos cards não cabe entre o
-  // título e a barra de contato. Lá a fila é deslizada com o dedo
-  // (rolagem horizontal nativa com encaixe) e o contador acompanha.
+  // Sem pin (movimento reduzido), a fila é deslizada com o dedo e o
+  // contador acompanha a rolagem horizontal.
   viewport.addEventListener('scroll', () => {
     if (root.classList.contains('is-pinned')) return;
     const max = viewport.scrollWidth - viewport.clientWidth;
@@ -201,7 +234,7 @@ function initSymptoms() {
     if (count) count.textContent = pad(Math.min(total, Math.round(p * (total - 1)) + 1)) + ' / ' + pad(total);
   }, { passive: true });
 
-  mm.add('(min-width: 901px)', () => {
+  mm.add('(min-width: 1px)', () => {
     root.classList.add('is-pinned');
 
     const tween = gsap.to(track, {
@@ -234,19 +267,121 @@ function initSymptoms() {
 }
 
 /* -------------------------------------------------------------
+   ESPECIALIDADES EM BARALHO — a seção prende e as cartas passam
+
+   Os cards do painel ativo viram um maço. A rolagem tira a carta de
+   cima (ela voa para a direita girando) e as de trás avançam para o
+   lugar dela. A posição é contínua — pos = progresso × (cartas − 1) —
+   e cada carta é desenhada pela distância até o topo (rel = índice −
+   pos): negativa, já saiu ou está saindo; positiva, está no maço.
+   Trocar entre Clínica e Cirúrgica redesenha o maço novo na mesma
+   posição da rolagem.
+   ------------------------------------------------------------- */
+// A carta sai para a DIREITA: para a esquerda ela passaria por cima do
+// título da seção no desktop.
+const DECK_OUT_X = 125;    // % da largura que a carta percorre ao sair
+const DECK_OUT_ROT = 14;   // graus de giro ao sair
+const DECK_STEP_Y = 14;    // px que cada carta de trás desce
+const DECK_STEP_S = 0.05;  // quanto cada carta de trás encolhe
+const DECK_TILT = 2.2;     // graus de inclinação das cartas de trás
+const DECK_VISIBLE = 3;    // cartas de trás à vista
+
+function initConditionsDeck() {
+  const root = document.querySelector('[data-conditions]');
+  if (!root || prefersReducedMotion()) return;
+
+  const bar = root.querySelector('[data-cond-progress]');
+  const count = root.querySelector('[data-cond-count]');
+  const painelAtivo = () => root.querySelector('[role="tabpanel"]:not([hidden])');
+
+  const motor = getScroll();
+  if (!motor) return;
+
+  const { gsap } = motor;
+  const pad = (n) => String(n).padStart(2, '0');
+  let pos = 0;
+
+  const desenhar = () => {
+    const painel = painelAtivo();
+    if (!painel) return;
+    const cartas = [...painel.querySelectorAll('.cond')];
+    const total = cartas.length;
+
+    cartas.forEach((carta, k) => {
+      const rel = k - pos;
+      let props;
+      if (rel <= -1) {
+        props = { xPercent: DECK_OUT_X, y: 0, scale: 1, rotate: DECK_OUT_ROT, opacity: 0 };
+      } else if (rel < 0) {
+        const t = -rel;
+        // Sólida quase até o fim: transparente no meio do caminho, ela
+        // deixava o texto da carta de baixo embaralhado através dela.
+        const opacity = t < 0.75 ? 1 : 1 - (t - 0.75) / 0.25;
+        props = { xPercent: DECK_OUT_X * t, y: 0, scale: 1, rotate: DECK_OUT_ROT * t, opacity };
+      } else {
+        const lado = k % 2 ? 1 : -1;
+        props = {
+          xPercent: 0,
+          y: DECK_STEP_Y * rel,
+          scale: 1 - DECK_STEP_S * rel,
+          rotate: lado * DECK_TILT * Math.min(rel, 1),
+          opacity: rel > DECK_VISIBLE ? 0 : 1,
+        };
+      }
+      gsap.set(carta, { ...props, zIndex: total - k });
+    });
+
+    if (bar) bar.style.setProperty('--p', String(total > 1 ? pos / (total - 1) : 0));
+    if (count) count.textContent = pad(Math.min(total, Math.round(pos) + 1)) + ' / ' + pad(total);
+  };
+
+  const mm = gsap.matchMedia();
+
+  mm.add('(min-width: 1px)', () => {
+    root.classList.add('is-deck');
+    const trocas = () => Math.max(1, (painelAtivo()?.querySelectorAll('.cond').length || 1) - 1);
+
+    const st = motor.ScrollTrigger.create({
+      trigger: root,
+      start: 'top top',
+      end: () => '+=' + Math.round(window.innerHeight * 0.8 * trocas()),
+      pin: true,
+      anticipatePin: 1,
+      invalidateOnRefresh: true,
+      onUpdate: (self) => {
+        pos = self.progress * trocas();
+        desenhar();
+      },
+    });
+
+    const aoTrocar = () => desenhar();
+    root.addEventListener('conditions:change', aoTrocar);
+    desenhar();
+
+    return () => {
+      st.kill();
+      root.removeEventListener('conditions:change', aoTrocar);
+      gsap.set(root.querySelectorAll('.cond'), { clearProps: 'transform,opacity,zIndex' });
+      root.classList.remove('is-deck');
+    };
+  });
+}
+
+/* -------------------------------------------------------------
    OS 3 MEDOS — a seção prende e os cards sobem um sobre o outro
 
-   Só no desktop: a seção fica presa pelo tempo de trocar os cards
-   (uma tela de rolagem por troca). O card que chega sobe de baixo,
-   recortado pela borda da pilha, e o anterior recua e esmaece por
-   baixo dele. No celular e com movimento reduzido os cards ficam em
-   coluna, em fluxo normal — o CSS já cuida desse estado.
+   A seção fica presa pelo tempo de trocar as cartas (uma tela de
+   rolagem por troca). A carta que chega sobe de baixo, recortada pela
+   borda da pilha, e a anterior recua por baixo dela — como
+   um baralho. No celular a pilha começa pela foto. Com movimento
+   reduzido as cartas ficam em coluna, em fluxo normal (estado do CSS).
    ------------------------------------------------------------- */
 function initFears() {
   const root = document.querySelector('[data-fears]');
   if (!root || prefersReducedMotion()) return;
 
   const cards = [...root.querySelectorAll('[data-fear]')];
+  const photo = root.querySelector('.fears__photo');
   const bar = root.querySelector('[data-fears-progress]');
   const count = root.querySelector('[data-fears-count]');
   if (cards.length < 2) return;
@@ -259,16 +394,25 @@ function initFears() {
   const pad = (n) => String(n).padStart(2, '0');
   const mm = gsap.matchMedia();
 
-  mm.add('(min-width: 901px)', () => {
+  /**
+   * Monta a pilha. O parâmetro base é o que está à vista antes da
+   * primeira troca:
+   * no desktop a primeira carta (a foto fica ao lado); no celular a foto,
+   * e as três cartas sobem por cima dela, uma de cada vez.
+   */
+  const montar = (base, chegando) => {
     root.classList.add('is-pinned');
-    gsap.set(cards.slice(1), { yPercent: 104 });
+    gsap.set(chegando, { yPercent: 104 });
+
+    const pilha = [base, ...chegando];
+    const trocas = chegando.length;
 
     const tl = gsap.timeline({
       defaults: { ease: 'none', duration: 1 },
       scrollTrigger: {
         trigger: root,
         start: 'top top',
-        end: () => '+=' + Math.round(window.innerHeight * (total - 1)),
+        end: () => '+=' + Math.round(window.innerHeight * trocas),
         pin: true,
         scrub: 0.6,
         anticipatePin: 1,
@@ -276,24 +420,31 @@ function initFears() {
         onUpdate: (self) => {
           if (bar) bar.style.setProperty('--p', String(self.progress));
           if (!count) return;
-          const atual = Math.min(total, Math.round(self.progress * (total - 1)) + 1);
-          count.textContent = pad(atual) + ' / ' + pad(total);
+          // A carta lida é a do topo: no celular a foto não conta.
+          const topo = Math.round(self.progress * trocas) + (base === photo ? 0 : 1);
+          count.textContent = pad(Math.max(1, Math.min(total, topo))) + ' / ' + pad(total);
         },
       },
     });
 
-    cards.slice(1).forEach((card, i) => {
+    chegando.forEach((card, i) => {
+      // A carta de baixo só recua e continua sólida; quem esmaece é a
+      // foto do celular. Esmaecer a carta deixava a foto aparecer
+      // através dela e embaralhava o texto.
       tl.to(card, { yPercent: 0 }, i)
-        .to(cards[i], { scale: 0.92, opacity: 0.35 }, i);
+        .to(pilha[i], { scale: 0.92, opacity: pilha[i] === photo ? 0.35 : 1 }, i);
     });
 
     return () => {
       tl.scrollTrigger.kill();
       tl.kill();
-      gsap.set(cards, { clearProps: 'transform,opacity' });
+      gsap.set([photo, ...cards], { clearProps: 'transform,opacity' });
       root.classList.remove('is-pinned');
     };
-  });
+  };
+
+  mm.add('(min-width: 901px)', () => montar(cards[0], cards.slice(1)));
+  mm.add('(max-width: 900px)', () => montar(photo, cards));
 }
 
 /* -------------------------------------------------------------
@@ -328,6 +479,8 @@ function initConditions() {
       }
     });
     panels.forEach((panel, i) => { panel.hidden = i !== index; });
+    // O baralho (initConditionsDeck) redesenha o maço do painel novo.
+    root.dispatchEvent(new CustomEvent('conditions:change'));
   };
 
   tabs.forEach((tab, i) => {
@@ -499,49 +652,15 @@ function initParallax() {
 }
 
 /* -------------------------------------------------------------
-   BARRA DE CONTATO (mobile)
-   Aparece depois do hero e some quando o rodapé — que já tem os
-   mesmos botões — entra em cena. Dois CTAs idênticos na tela ao
-   mesmo tempo é ruído.
-   ------------------------------------------------------------- */
-function initDock() {
-  const dock = document.querySelector('[data-dock]');
-  const footer = document.querySelector('[data-footer-cta]');
-  if (!dock) return;
-
-  let footerVisible = false;
-
-  if (footer) {
-    new IntersectionObserver(([entry]) => {
-      footerVisible = entry.isIntersecting;
-      update();
-    }, { threshold: 0.15 }).observe(footer);
-  }
-
-  let ticking = false;
-  function update() {
-    const past = window.scrollY > window.innerHeight * 0.85;
-    dock.dataset.show = String(past && !footerVisible);
-    ticking = false;
-  }
-
-  window.addEventListener('scroll', () => {
-    if (ticking) return;
-    ticking = true;
-    requestAnimationFrame(update);
-  }, { passive: true });
-
-  update();
-}
-
-/* -------------------------------------------------------------
    HERO — o vídeo conduz a entrada
 
    A cada chegada ao hero (na abertura, depois da cortina, e toda vez
    que a pessoa volta ao topo) o vídeo toca UMA vez, do começo. Enquanto
    a Dra. Isabela se move, o texto sobe de baixo para cima, letra por
    letra na manchete; os tempos de cada bloco estão no CSS. Quando o
-   vídeo termina, entram por último a barra de navegação e os botões.
+   vídeo termina, entram por último a barra de navegação e o link para
+   as especialidades. Não há botão de agendar no hero: a pessoa agenda
+   depois de conhecer a doutora, mais abaixo na página.
    Ao sair do hero tudo volta ao estado inicial, pronto para repetir.
 
    Se o navegador bloquear o autoplay (modo economia do iPhone, por
@@ -658,8 +777,9 @@ export function initHome() {
   initSymptoms();
   initJourney();
   initConditions();
+  initConditionsDeck();
+  initZoom();
   initFears();
   initVoices();
   initParallax();
-  initDock();
 }

@@ -179,18 +179,6 @@
             tecnologia para acompanhar você em cada fase da vida.
           </p>
 
-          <div class="hero__actions" data-hero-step="final">
-            <a class="btn btn--ink btn--lg" data-cursor="agendar"
-               href="https://api.whatsapp.com/send?phone=5511964451045&text=Ol%C3%A1%2C%20vim%20pelo%20site%20e%20gostaria%20de%20agendar%20uma%20consulta."
-               target="_blank" rel="noopener">
-              <span class="btn__wipe" aria-hidden="true"></span>
-              <span class="btn__inner" data-text="Agendar consulta ↗"><span class="btn__text">Agendar consulta <span aria-hidden="true">↗</span></span></span>
-            </a>
-            <a class="hero__link" href="#condicoes" data-cursor="ver">
-              Conheça as especialidades <span aria-hidden="true">↗</span>
-            </a>
-          </div>
-
           <div class="hero__foot" data-hero-step="4">
             <span class="hero__foot-label">Áreas de atuação</span>
             <p class="hero__specialties"><span>Ginecologia</span><span>Endometriose</span><span>Cirurgia robótica</span></p>
@@ -360,7 +348,6 @@
             <span class="symptoms__count" data-symptoms-count>01 / 05</span>
             <span class="symptoms__bar"><i data-symptoms-progress></i></span>
           </div>
-          <p class="symptoms__hint" aria-hidden="true">Deslize para ver os 5 →</p>
         </div>
 
         <div class="symptoms__viewport" data-symptoms-viewport>
@@ -549,7 +536,7 @@
          5. ESPECIALIDADES
          ========================================================== -->
     <section class="section conditions" id="condicoes" data-conditions>
-      <div class="shell">
+      <div class="shell conditions__layout">
 
         <div class="conditions__head">
           <div data-reveal>
@@ -564,13 +551,18 @@
             <button class="toggle__btn" role="tab" type="button" id="tab-cirurgica"
                     aria-selected="false" aria-controls="painel-cirurgica">Ginecologia cirúrgica</button>
           </div>
+
+          <div class="conditions__meter" aria-hidden="true">
+            <span class="conditions__count" data-cond-count>01 / 06</span>
+            <span class="conditions__bar"><i data-cond-progress></i></span>
+          </div>
         </div>
 
         <!-- Painel: clínica -->
         <div class="conditions__panel" id="painel-clinica" role="tabpanel" aria-labelledby="tab-clinica">
           <div class="conditions__grid">
 
-            <article class="cond" data-reveal>
+            <article class="cond">
               <span class="cond__idx">01</span>
               <div class="cond__body">
                 <h3>Endometriose</h3>
@@ -588,7 +580,7 @@
               </div>
             </article>
 
-            <article class="cond" data-reveal data-delay="1">
+            <article class="cond">
               <span class="cond__idx">02</span>
               <div class="cond__body">
                 <h3>Menopausa e climatério</h3>
@@ -606,7 +598,7 @@
               </div>
             </article>
 
-            <article class="cond" data-reveal data-delay="2">
+            <article class="cond">
               <span class="cond__idx">03</span>
               <div class="cond__body">
                 <h3>Dor na relação sexual</h3>
@@ -624,7 +616,7 @@
               </div>
             </article>
 
-            <article class="cond" data-reveal>
+            <article class="cond">
               <span class="cond__idx">04</span>
               <div class="cond__body">
                 <h3>Endometriose e fertilidade</h3>
@@ -642,7 +634,7 @@
               </div>
             </article>
 
-            <article class="cond" data-reveal data-delay="1">
+            <article class="cond">
               <span class="cond__idx">05</span>
               <div class="cond__body">
                 <h3>Síndrome urogenital</h3>
@@ -659,7 +651,7 @@
               </div>
             </article>
 
-            <article class="cond" data-reveal data-delay="2">
+            <article class="cond">
               <span class="cond__idx">06</span>
               <div class="cond__body">
                 <h3>Dores atípicas</h3>
@@ -817,9 +809,9 @@
 
         <div class="numbers__grid">
 
-          <div class="numbers__item" data-rise data-delay="0">
+          <div class="numbers__item" data-reveal data-delay="0">
             <div class="numbers__inner">
-              <figure class="numbers__photo numbers__photo--1">
+              <figure class="numbers__photo numbers__photo--1" data-zoom>
                 <img src="assets/images/pages/home/robo-1.webp" alt="Cirurgiã olhando o visor 3D do console da cirurgia robótica"
                      width="945" height="1663" loading="lazy" decoding="async" />
               </figure>
@@ -829,9 +821,9 @@
             </div>
           </div>
 
-          <div class="numbers__item" data-rise data-delay="1">
+          <div class="numbers__item" data-reveal data-delay="1">
             <div class="numbers__inner">
-              <figure class="numbers__photo numbers__photo--2">
+              <figure class="numbers__photo numbers__photo--2" data-zoom>
                 <img src="assets/images/pages/home/robo-2.webp" alt="Cirurgiã sentada no console do robô, com as mãos nos controles das pinças e os pés junto aos pedais"
                      width="942" height="1670" loading="lazy" decoding="async" />
               </figure>
@@ -841,9 +833,9 @@
             </div>
           </div>
 
-          <div class="numbers__item" data-rise data-delay="2">
+          <div class="numbers__item" data-reveal data-delay="2">
             <div class="numbers__inner">
-              <figure class="numbers__photo numbers__photo--3">
+              <figure class="numbers__photo numbers__photo--3" data-zoom>
                 <img src="assets/images/pages/home/robo-3.webp" alt="Braços do robô cirúrgico posicionados sobre a mesa de cirurgia"
                      width="944" height="1666" loading="lazy" decoding="async" />
               </figure>
@@ -1185,7 +1177,7 @@
        RODAPÉ
        ============================================================ -->
   <footer class="footer">
-    <div class="footer__cta" data-footer-cta>
+    <div class="footer__cta">
       <span class="footer__glow" aria-hidden="true"></span>
       <div class="shell">
         <h2 class="footer__cta-title" data-split>
@@ -1266,18 +1258,6 @@
       </div>
     </div>
   </footer>
-
-  <!-- Barra de contato flutuante (mobile) -->
-  <div class="dock" data-dock data-show="false">
-    <a class="btn btn--accent" href="https://api.whatsapp.com/send?phone=5511964451045&text=Ol%C3%A1%2C%20vim%20pelo%20site%20e%20gostaria%20de%20agendar%20uma%20consulta." target="_blank" rel="noopener">
-      <span class="btn__wipe" aria-hidden="true"></span>
-      <span class="btn__inner" data-text="WhatsApp"><span class="btn__text">WhatsApp</span></span>
-    </a>
-    <a class="btn btn--ghost" href="tel:+551150933921">
-      <span class="btn__wipe" aria-hidden="true"></span>
-      <span class="btn__inner" data-text="Ligar"><span class="btn__text">Ligar</span></span>
-    </a>
-  </div>
 
   <!-- Bibliotecas servidas do próprio domínio, não de CDN.
        Motivo concreto: scripts "defer" seguram o DOMContentLoaded, e é

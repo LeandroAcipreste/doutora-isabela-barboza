@@ -151,17 +151,18 @@ export function onScrollToggle(el, montar, desmontar, start = 'top 84%') {
     }
 
     // Dentro de uma seção presa (o GSAP a embrulha num .pin-spacer), o
-    // elemento fica parado na tela enquanto a rolagem corre. Sem avisar
-    // o gatilho, ele media a posição natural e desmontava o título no
-    // meio da seção; com pinnedContainer a medição desconta o tempo
-    // preso e o texto só sai quando a rolagem deixa a seção.
-    const presa = el.closest('.pin-spacer')?.firstElementChild || undefined;
+    // elemento fica parado na tela enquanto a rolagem corre, mas a
+    // medição dele usa a posição natural — o título sumia no meio da
+    // seção. O fim passa a ser o fim do próprio .pin-spacer, cuja altura
+    // já inclui todo o tempo preso: o texto só sai quando a seção vai
+    // embora de verdade.
+    const espaco = el.closest('.pin-spacer');
 
     motor.ScrollTrigger.create({
       trigger: el,
       start,
+      endTrigger: espaco || el,
       end: 'bottom top',
-      pinnedContainer: presa,
       invalidateOnRefresh: true,
       onEnter: () => montar(el),
       onEnterBack: () => montar(el),

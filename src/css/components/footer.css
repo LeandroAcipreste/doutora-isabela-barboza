@@ -110,27 +110,3 @@
   color: #93b5a4;
 }
 
-/* ---- Barra flutuante de contato (mobile) ---- */
-.dock {
-  position: fixed;
-  left: 1.6rem; right: 1.6rem; bottom: 1.6rem;
-  z-index: var(--z-nav);
-  display: none;
-  gap: 1rem;
-  padding: 1rem;
-  border-radius: .2rem;
-  background: rgba(21, 58, 50, .82);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  box-shadow: 0 1.6rem 4rem -1rem rgba(0, 0, 0, .5);
-  transform: translateY(150%);
-  transition: transform .6s var(--ease-out);
-}
-.dock[data-show="true"] { transform: translateY(0); }
-.dock { color: var(--c-text-on-dark); }
-.dock .btn { flex: 1; }
-/* No fundo escuro da barra o contorno claro precisa de wipe claro. */
-.dock .btn--ghost { --btn-wipe: var(--c-paper); --btn-fg-hover: var(--c-hero-ink); }
-.dock .btn__inner { justify-items: center; padding: 1.4rem 1rem; }
-
-@media (max-width: 760px) { .dock { display: flex; } }
