@@ -146,6 +146,9 @@
   display: block;
   width: 100%;
   height: 100%;
+  /* Segunda garantia para o Safari: o próprio vídeo já nasce em arco,
+     então nada fica de canto reto mesmo se o recorte do pai falhar. */
+  border-radius: 46% 46% 0 0 / 28% 28% 0 0;
   object-fit: cover;
   object-position: 50% 50%;
 }
@@ -246,6 +249,18 @@
   transform: none;
   transition: transform 1s var(--ease-out) var(--d, 0s);
 }
+
+/* Safari: numa caixa com overflow:hidden e border-radius, filho que o
+   navegador compõe em camada própria (vídeo, imagem com transform ou em
+   transição) escapa do recorte e aparece de canto reto por cima da
+   moldura. isolation:isolate força o recorte sem apagar a sombra — ao
+   contrário do truque com -webkit-mask-image. */
+.hero__frame,
+.about__media-inner,
+.jcard,
+.scard,
+.fears__photo,
+.numbers__photo { isolation: isolate; }
 
 /* Usada pelo selo giratório do "Sobre mim". */
 @keyframes spin-slow { to { transform: rotate(360deg); } }

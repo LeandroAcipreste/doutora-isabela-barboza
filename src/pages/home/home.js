@@ -354,7 +354,24 @@ function initConditionsDeck() {
       },
     });
 
-    const aoTrocar = () => desenhar();
+    // Trocar de tema recomeça o maço novo da primeira carta. Como a
+    // posição é a rolagem, a troca leva a rolagem ao início do trecho
+    // preso — de uma vez, sem animar: a seção está presa, então nada
+    // pula na tela, só o maço volta para a carta 01.
+    const aoTrocar = () => {
+      pos = 0;
+      desenhar();
+      if (st.progress <= 0) return;
+      // Rolagem nativa além do Lenis: no celular é ela que manda. Refeito
+      // no quadro seguinte porque o próprio toque no botão pode mexer a
+      // rolagem logo depois do clique.
+      const voltar = () => {
+        if (motor.lenis) motor.lenis.scrollTo(st.start, { immediate: true, force: true });
+        window.scrollTo(0, st.start);
+      };
+      voltar();
+      requestAnimationFrame(voltar);
+    };
     root.addEventListener('conditions:change', aoTrocar);
     desenhar();
 

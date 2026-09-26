@@ -6,11 +6,14 @@
  * lógica pesada mora nos módulos importados — se este arquivo
  * começar a crescer, é sinal de que algo nasceu no lugar errado.
  *
- * Ordem: componentes globais → smooth scroll → página. O reveal
+ * Ordem: medida do dispositivo → componentes globais → smooth scroll →
+ * página → encaixe das seções presas. O reveal
  * fica por último dentro do preloader, para nenhuma animação de
  * entrada rodar atrás da cortina e ser desperdiçada.
  */
 
+import { measureViewport, applyViewport } from './utils/viewport.js';
+import { initFit } from './components/fit.js';
 import { initNav } from './components/nav.js';
 import { initCursor } from './components/cursor.js';
 import { initMarquees } from './components/marquee.js';
@@ -50,6 +53,9 @@ function resetScroll() {
 }
 
 function boot() {
+  // Primeira coisa do site: medir a tela real. Tudo o que vem depois
+  // (raiz rem, pins, encaixes) já nasce na escala certa do aparelho.
+  applyViewport(measureViewport());
   resetScroll();
 
   // O motor sobe antes das peças: cada uma consulta se há GSAP para
@@ -74,6 +80,28 @@ function boot() {
   // qualquer pin, atual ou futuro.
   motor?.ScrollTrigger.sort();
 
+  // Encaixe das seções presas na altura da tela. Precisa dos pins já
+  // criados (só age em seção presa) e é refeito sempre que algo muda o
+  // tamanho do conteúdo ou da tela.
+  const fitAll = initFit();
+  const reencaixar = () => {
+    motor?.ScrollTrigger.refresh();
+    fitAll();
+    motor?.ScrollTrigger.refresh();
+  };
+  if (document.fonts) document.fonts.ready.then(reencaixar);
+
+  let medirTimer;
+  const aoMudarTela = () => {
+    clearTimeout(medirTimer);
+    medirTimer = setTimeout(() => {
+      applyViewport(measureViewport());
+      reencaixar();
+    }, 180);
+  };
+  window.addEventListener('resize', aoMudarTela);
+  window.addEventListener('orientationchange', aoMudarTela);
+
   // A cortina só sai depois que a página está montada; o reveal é
   // ligado no mesmo instante, então a primeira dobra anima na
   // frente do usuário em vez de já ter animado escondida.
@@ -84,6 +112,7 @@ function boot() {
     // seguir achando que a página não rola e engolir o primeiro
     // clique num link de âncora.
     if (motor?.lenis) motor.lenis.resize();
+    fitAll();
     motor?.ScrollTrigger.refresh();
     initReveal();
   });

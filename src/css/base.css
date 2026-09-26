@@ -17,7 +17,9 @@
    não virar tipografia microscópica em telas pequenas nem
    gigantismo em monitor ultrawide. */
 html {
-  font-size: clamp(9.2px, 0.6944vw, 12.4px);
+  /* --fit vem de utils/viewport.js: reduz a raiz em telas largas e
+     baixas, para o layout (dimensionado pela largura) caber na altura. */
+  font-size: calc(clamp(9.2px, 0.6944vw, 12.4px) * var(--fit, 1));
   scroll-behavior: smooth;
   overscroll-behavior-y: none;
   /* A P052 só tem peso regular: sem isto, todo peso 600 da serifa
@@ -27,7 +29,7 @@ html {
 }
 
 @media (max-width: 900px) {
-  html { font-size: clamp(9px, 2.55vw, 11.5px); }
+  html { font-size: calc(clamp(9px, 2.55vw, 11.5px) * var(--fit, 1)); }
 }
 
 body {
@@ -149,3 +151,12 @@ strong, b { font-weight: 600; }
 }
 .on-dark ::selection { background: var(--c-accent); color: var(--c-ink); }
 ::selection { background: var(--c-hero); color: var(--c-hero-ink); }
+
+/* ---- Encaixe na altura (components/fit.js) ----
+   Seção presa cujo conteúdo não cabe na tela é reduzida por inteiro
+   na proporção exata. A escala é escrita pelo JS; origem no topo
+   porque a seção presa começa no topo da tela. */
+[data-fit] {
+  transform: scale(var(--fit-scale, 1));
+  transform-origin: 50% 0;
+}
